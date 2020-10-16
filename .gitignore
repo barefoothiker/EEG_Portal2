@@ -1,0 +1,4 @@
+eegPortalFrontEnd/node_modules/
+webEEGPortal/*.pyc
+webEEGPortal/eegPortalApp/*.pyc
+

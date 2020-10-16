@@ -1,0 +1,43 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-8" *ngIf="user">
+            <h1>User Profile: {{user.username}}</h1>
+            <form role="form">
+                <div class="form-content">
+
+                    <div class="form-group">
+                      <input type="text"  [(ngModel)]="user.username" [ngModelOptions]="{standalone: true}"  class="form-control input-underline input-lg" id="username" disabled>
+                    </div>
+
+                    <div class="form-group">
+                      <input type="text"  [(ngModel)]="user.email" [ngModelOptions]="{standalone: true}"  class="form-control input-underline input-lg" id="email" disabled >
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="user.addressLine1" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="addressLine1" placeholder="Address Line 1">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="user.addressLine2" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="addressLine2" placeholder="Address Line 2">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="user.city" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="city" placeholder="City">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="user.state" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="state" maxlength="2" placeholder="State">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="user.zipCode" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="zipCode" maxlength="12" placeholder="Zip Code">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="user.phoneNumber" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="phoneNumber" maxlength="12" placeholder="Phone Number">
+                    </div>
+                </div>
+                <button  id="button_0" (click)="updateUser()"  class = "btn btn-primary" >Submit</button>&nbsp;
+            </form>
+            <br/>
+            <div class="alert alert-success" role="alert" *ngIf="message">
+              {{message}}
+            </div>
+        </div>
+    </div>
+</div>

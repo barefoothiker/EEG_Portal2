@@ -1,0 +1,8 @@
+DJANGO_DB_PREFIX=local_
+DJANGO_MYSQL_USER=local_developer
+DJANGO_MYSQL_PASSWORD=local_password
+DJANGO_MYSQL_HOST=localhost
+DJANGO_MYSQL_SSL_CERT=
+JWT_SECRET_KEY='abcdefghijklmnopqrstuvwxyz'
+SECURE_SSL_REDIRECT=False
+DJANGO_DEBUG_MODE=True

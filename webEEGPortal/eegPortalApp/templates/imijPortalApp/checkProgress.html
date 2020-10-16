@@ -1,0 +1,488 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+{% block css %}
+
+<style>
+
+#aboutDescription{
+    font-size: 14px;
+    font-weight: normal;
+    resize: none;
+    overflow-y: scroll;
+}
+
+.rTable    { display: table; }
+.rTableRow       { display: table-row; }
+.rTableHeading    { display: table-header-group; font-weight:bold; text-align: center;}
+.rTableBody    { display: table-row-group; }
+.rTableFoot    { display: table-footer-group; }
+.rTableCell, .rTableHead  { display: table-cell; padding: 10px;}
+
+{% for processObj in processObjList %}
+  {% for imageObj in processObj.imageObjList %}
+    #{{processObj.processName}}-{{imageObj.imageName}}{position:relative;}
+    #horizontal-{{processObj.processName}}-{{imageObj.imageName}}{width:1px;height:100%;position:absolute;background-color:red;}
+    #vertical-{{processObj.processName}}-{{imageObj.imageName}}{width:100%;height:1px;position:absolute;background-color:red;}
+  {% endfor %}
+{% endfor %}
+
+</style>
+{% endblock css%}
+{% block js %}
+<script type="text/javascript">
+  function writeMessage(canvas, message) {
+    var context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.font = '18pt Calibri';
+    context.fillStyle = 'black';
+    context.fillText(message, 10, 25);
+  }
+
+  function getMousePos(canvas, evt) {
+    var rect = canvas.getBoundingClientRect();
+    return {
+      x: evt.clientX - rect.left,
+      y: evt.clientY - rect.top
+    };
+  }
+
+
+  $(document).ready(function() {
+
+    $('#dataFileTable').DataTable({
+      searching: false,
+      paging: false,
+      info: false
+    });
+
+    $('#statusTable').DataTable({
+      searching: false,
+      paging: false,
+      info: false
+    });
+    $('#currentStatusTable').DataTable({
+      searching: false,
+      paging: false,
+      info: false
+    });
+    //
+    // $( "#terminateButton" ).click(function() {
+    //  if (confirm("Are you sure? Terminating will stop all processing for the data file.") ){
+    //
+    //    $("#checkProgressForm").attr('action',"imijPortalApp/terminateProcess");
+    //    $("#checkProgressForm").submit();
+    //
+    //  }
+    // });
+    {% for processObj in processObjList %}
+
+        //set up the canvas and context
+        {% for imageObj in processObj.imageObjList %}
+
+          $('#img_{{processObj.processName}}-{{imageObj.imageName}}').on('mousemove', null, [$('#horizontal-{{processObj.processName}}-{{imageObj.imageName}}'), $('#vertical-{{processObj.processName}}-{{imageObj.imageName}}')],function(e){
+
+            // var offset = $(this).offset();
+            var position = $(this).position();
+
+            var X1 = e.pageX;
+            var Y1 = e.pageY;
+
+            // e.data[1].css('left', X1);
+            // e.data[0].css('top', Y1);
+
+            // e.data[1].css('left', X1 - position.left);
+            e.data[1].css('left', X1-position.left - parseFloat({{imageObj.imageWidth}}) + e.offSetX);
+            e.data[1].css('top', Y1-parseFloat({{imageObj.imageHeight}}*1.5));
+            e.data[1].css('width', parseFloat({{imageObj.imageWidth}}));
+            // e.data[1].css('visibility', 'visible');
+            e.data[1].css('visibility', 'hidden');
+
+            e.data[0].css('left', X1 -parseFloat({{imageObj.imageWidth}}) - position.left );
+            e.data[0].css('top', Y1-position.top - parseFloat({{imageObj.imageWidth}}) + e.offSetY);
+            e.data[0].css('height', parseFloat({{imageObj.imageHeight}}));
+            // e.data[0].css('visibility', 'visible');
+            e.data[0].css('visibility', 'hidden');
+
+            console.log(" mousemove " + e.pageX + ":" + e.pageY + " position " + position.left + ":" + position.top + " offset " + e.offsetX + ":" +e.offSetY)
+            console.log(" horizontal " + ( X1-position.left - parseFloat({{imageObj.imageWidth}})) + ":" + (e.pageY) + " vertical " + e.pageX + ":" + (e.pageY-e.offSetY))
+
+          });
+
+          $('#{{processObj.processName}}-{{imageObj.imageName}}').on('mouseenter', null, [$('#horizontal-{{processObj.processName}}-{{imageObj.imageName}}'), $('#vertical-{{processObj.processName}}-{{imageObj.imageName}}')], function(e){
+
+              console.log(" ************ mouseenter " + e.data)
+
+              e.data[0].show();
+              e.data[1].show();
+
+          }).on('mouseleave', null, [$('#horizontal-{{processObj.processName}}-{{imageObj.imageName}}'), $('#vertical-{{processObj.processName}}-{{imageObj.imageName}}')], function(e){
+
+                  console.log(" ------------- mouseleave " + e.data)
+
+                  e.data[0].hide();
+                  e.data[1].hide();
+
+          }).on('click', null, [$('#horizontal-{{processObj.processName}}-{{imageObj.imageName}}'), $('#vertical-{{processObj.processName}}-{{imageObj.imageName}}')], function(e){
+
+                  console.log(" ------------- mouseleave " + e.data)
+
+                  e.preventDefault();
+
+          });
+
+          $('#{{processObj.processName}}-{{imageObj.imageName}}').on('dragstart', function(event) { event.preventDefault(); });
+
+          $("#{{processObj.processName}}-{{imageObj.imageName}}")
+          .mousedown(function(e){
+              var isDragging = true;
+              $(this).on("mousemove",function(e){
+                if (isDragging) {
+                  var imageName = e.target.id;
+                  var uploadFileId = $("#uploadFileId").val();
+
+                  var offset = $(this).offset();
+
+                  var p1 = { x: e.pageX - offset.left, y: e.pageY - offset.top};
+                  var p0 = $(this).data("p0") || p1;
+                  console.log("dragging from x:" + p0.x + " y:" + p0.y + "to x:" + p1.x + " y:" + p1.y);
+                  $(this).data("p0", p1);
+
+                  $.ajax({
+                    url: '/imijPortalApp/triangulateImageLowRes/',
+                    data: {
+                      'uploadFileId': uploadFileId,
+                      'imageName': imageName,
+                      'X':p0.x,
+                      'Y':p0.y
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                      // alert(data);
+                      // alert(data.slice);
+                      $.each(data.results, function(k, v) {
+                          //alert( " k = " + v.imageName + " v = " + v.imagePath);
+                          $("#"+ v.imageName).attr('src',"{% static "img/" %}" + v.imagePath);
+                          // alert($("#slice_" + v.imageName).text());
+                          // $("#slice_" + v.imageName).text(v.imagePath);
+                      }); // end each
+                    } //end success
+                  }); //end ajax
+                } // end if dragging
+              }); // end mouse move
+          }) // end mouse down
+          .mouseup(function(){
+              $(this).off("mousemove");
+              var isDragging = false;
+          });
+
+          $('#{{processObj.processName}}-{{imageObj.imageName}}').click(function(e) {
+
+              var imageName = e.target.id;
+              var uploadFileId = $("#uploadFileId").val();
+
+              var offset = $(this).offset();
+
+              var X = (e.pageX - offset.left);
+              var Y = (e.pageY - offset.top);
+
+              $('#coord_{{processObj.processName}}_{{imageObj.imageName}}').text('X: ' + X + ', Y: ' + Y);
+
+              $.ajax({
+                url: '/imijPortalApp/triangulateImage/',
+                data: {
+                  'uploadFileId': uploadFileId,
+                  'imageName': imageName,
+                  'X':X,
+                  'Y':Y
+                },
+                dataType: 'json',
+                success: function (data) {
+                  // alert(data.imageName);
+                  // alert(data.slice);
+                  $.each(data.results, function(k, v) {
+                      //alert( " k = " + v.imageName + " v = " + v.imagePath);
+                      $("#"+ v.imageName).attr('src',"{% static "img/" %}" + v.imagePath);
+                      // alert($("#slice_" + v.imageName).text());
+                      // $("#slice_" + v.imageName).text(v.imagePath);
+                  });
+                }
+              });
+          });
+
+        {% endfor %}
+
+        {% for regionId, regionName in regions.items %}
+
+          $('#region-{{processObj.processName}}-{{regionId}}').click(function(e) {
+
+              var checkboxValue = e.target.id;
+              var uploadFileId = $("#uploadFileId").val();
+              var regionIds = []
+              // console.log($(this).id);
+
+              {% for regionId2, regionName2 in regions.items %}
+
+                if ( $('#region-{{processObj.processName}}-{{regionId2}}').is(":checked") ) {
+                  regionIds.push($('#region-{{processObj.processName}}-{{regionId2}}').val());
+                  // console.log(" regionIds " + regionIds);
+
+                }
+
+              {% endfor %}
+              console.log(" regionIds " + regionIds);
+              $.ajax({
+                url: '/imijPortalApp/triangulateROIImages/',
+                data: {
+                  'uploadFileId': uploadFileId,
+                  'regionIds':JSON.stringify(regionIds)
+                },
+                dataType: 'json',
+                success: function (data) {
+                  $.each(data.results, function(k, v) {
+                      console.log(" in response for ROI ")
+                      $("#"+ v.imageName).attr('src',"{% static "img/" %}" + v.imagePath);
+                  });
+                }
+              });
+          });
+
+        {% endfor %}
+
+    {% endfor %}
+
+  });
+
+  function terminateSubmit() {
+    if (confirm("Are you sure? Terminating will stop all processing for the data file.") == true) {
+      $("#checkProgressForm").attr('action', "/imijPortalApp/terminateProcess/");
+      $("#checkProgressForm").submit();
+
+    }
+  }
+
+  function refreshSubmit() {
+
+    $("#checkProgressForm").attr('action', "/imijPortalApp/checkProgress/");
+    $("#checkProgressForm").submit();
+
+  }
+
+  function testTriangulation() {
+
+    $("#checkProgressForm").attr('action', "/imijPortalApp/testTriangulation/");
+    $("#checkProgressForm").submit();
+
+  }
+
+  function testOverlay() {
+
+    $("#checkProgressForm").attr('action', "/imijPortalApp/testOverlay/");
+    $("#checkProgressForm").submit();
+
+  }
+
+  function threeDViewer() {
+
+    $("#checkProgressForm").attr('action', "/imijPortalApp/threeDViewer/");
+    $("#checkProgressForm").submit();
+
+  }
+
+</script>
+{% endblock js %}
+{% block content %}
+<form action="/imijPortalApp/threeDViewer" method="post" id="checkProgressForm" name="checkProgressForm">
+  {% csrf_token %}
+  <input type="hidden" value="{{uploadFile.id}}" name="uploadFileId" id="uploadFileId" />
+
+  <div class="row">
+    <div class="col-lg-12">
+      <!-- Example row of columns -->
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h4 class="panel-title">
+            <a data-toggle="collapse" data-parent="#panels1" href="#processListPanel">
+              Processes </b>&nbsp;( Please click to toggle this panel. )
+            </a>
+          </h4>
+        </div>
+        <div id="processListPanel" class="panel-collapse collapse in">
+          <div class="panel-body">
+            <br />
+            {% for processObj in processObjList %}
+            <div class="panel-group" id="accordion1">
+              <div class="panel panel-warning">
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    <a data-toggle="collapse" data-parent="#accordion3" href="#processPanel-{{forloop.counter0}}">
+                      {{ processObj.displayProcessName }} </b>&nbsp;( Please click to toggle this panel. )
+                    </a>
+                  </h4>
+                </div>
+                <div id="processPanel-{{forloop.counter0}}" class="panel-collapse collapse {% if forloop.first %} in {% endif %}">
+                  <div class="panel-body">
+                    <div class="panel-group" id="accordion2">
+                      <!-- start images panel -->
+                      <div class="panel panel-success" style="overflow-x:auto;">
+                        <div class="panel-heading">
+                          <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion2" href="#processImagesPanel-{{forloop.counter0}}">
+                              Images &nbsp;( Please click to toggle this panel. )
+                            </a>
+                          </h4>
+                        </div>
+                        <div id="processImagesPanel-{{forloop.counter0}}" class="panel-collapse collapse in" style="height:400px;overflow-y:auto;" -webkit-scrollbar>
+                          <div class="panel-body">
+                            <p>&nbsp;</p>
+                            <div class="form-group">
+
+                              <div class="rTable">
+                                {% if processObj.displayProcessName == 'ROI Overlays' %}
+                                <div class="rTableHeading">
+                                  {% for regionId, regionName in regions.items %}
+                                  <div class="rTableCell rTableHeading">
+                                    <label for="region-{{processObj.processName}}-{{regionId}}">{{regionName}}</label>
+                                    <input type="checkbox" id="region-{{processObj.processName}}-{{regionId}}"
+                                           name="region-{{processObj.processName}}-{{regionId}}" value = "{{regionId}}"/>
+                                  </div>
+                                  {% endfor %}
+                                </div>
+                                {% endif %}
+
+                                  <div class="rTableHeading">
+                                    {% for imageObj in processObj.imageObjList %}
+                                      <div class="rTableCell rTableHeading">
+                                          <p>{{imageObj.imageType}}</p>
+                                      </div>
+                                    {% endfor %}
+                                  </div>
+                                  <div class="rTableBody">
+                                    <div class="rTableRow">
+                                      {% for imageObj in processObj.imageObjList %}
+                                      <div class="rTableCell">
+                                        <p>
+                                          <div id = "{{processObj.processName}}-{{imageObj.imageName}}" style="position:static;width:33%;">
+
+                                            <div id="horizontal-{{processObj.processName}}-{{imageObj.imageName}}" style="visibility:hidden;"></div>
+                                            <div id="vertical-{{processObj.processName}}-{{imageObj.imageName}}" style="visibility:hidden;"></div>
+
+                                            <img id = "img_{{processObj.processName}}-{{imageObj.imageName}}" src="{% static "img/" %}{{imageObj.imageName}}"/>
+
+                                          </div>
+                                        </p>
+                                      </div>
+                                      {% endfor %}
+                                    </div>
+                                    <div class="rTableRow">
+                                      {% for imageObj in processObj.imageObjList %}
+                                        <div class="rTableCell">
+                                            <p>
+                                                <div id = "coord_{{processObj.processName}}_{{imageObj.imageName}}"></div>
+                                            </p>
+                                            <p>
+                                                <div id = "slice_{{processObj.processName}}_{{imageObj.imageName}}"></div>
+                                            </p>
+                                        </div>
+                                      {% endfor %}
+                                    </div>
+                                  </div>
+                            </div>
+                            <!-- end form group -->
+                          </div>
+                          <!-- end panel body -->
+                        </div>
+                        <!-- end images panel -->
+                        <!-- start logs panel -->
+                        <div class="panel panel-success" style="overflow-x:auto;">
+                          <div class="panel-heading">
+                            <h4 class="panel-title">
+                              <a data-toggle="collapse" data-parent="#accordion2" href="#processLogsPanel-{{forloop.counter0}}">
+                                Logs &nbsp;( Please click to toggle this panel. )
+                              </a>
+                            </h4>
+                          </div>
+                          <div id="processLogsPanel-{{forloop.counter0}}" class="panel-collapse collapse" style="height:400px;overflow-y:auto;" -webkit-scrollbar>
+                            <div class="panel-body">
+                              <p>&nbsp;</p>
+                              <div class="form-group">
+                                <div class="table-responsive">
+                                  <table class="table table-striped table-bordered table-hover" id="log-{{forloop.counter0}}">
+                                    <thead>
+                                      <tr>
+                                        <th>Log</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr class="{% cycle 'odd gradeX' 'even gradeC' %}">
+                                        <td>
+                                          <div style="max-height:100px;overflow-y:scroll;text-align-last:right;">{{processObj.log}}</div>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <!-- end logs panel -->
+                        </div>
+                        <!-- end contrast panel -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <br />
+              {% endfor %}
+            </div>
+            <!-- end panel group -->
+          </div>
+          <!-- end panel body -->
+        </div>
+      </div>
+
+      <div class="panel-body">
+        <div class="">
+          <div class="row jumbotron" style="text-align:left;">
+            <p>
+              <label for="runningProcessDetails">Details of current process:</label><br />
+              <div class="table-responsive">
+                <table id="currentStatusTable" class="display" cellspacing="0" width="100%">
+                  <thead>
+                    <tr>
+                      <th>Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+
+                    {% for runningProcessDetail in runningProcessDetails %}
+                    <tr>
+                      <td>
+                        {{ runningProcessDetail }}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </p>
+            <p>
+              <button type="submit" class="btn btn-primary" value="0" onclick="javascript:refreshSubmit();" name="imijPortalHomeButton" id="imijPortalHomeButton" style="margin-bottom: 5px;margin-right: 5px; width:200px;">Refresh</button>
+              <button type="submit" class="btn btn-primary" value="0" onclick="javascript:threeDViewer();" name="imijPortalHomeButton" id="imijPortalHomeButton" style="margin-bottom: 5px;margin-right: 5px; width:200px;">ThreeD Viewer</button>
+              <button type="submit" class="btn btn-primary" value="0" onclick="javascript:testTriangulation();" name="imijPortalHomeButton" id="imijPortalHomeButton" style="margin-bottom: 5px;margin-right: 5px; width:200px;">Test Triangulation</button>
+              <button type="submit" class="btn btn-primary" value="0" onclick="javascript:testOverlay();" name="imijPortalHomeButton" id="imijPortalHomeButton" style="margin-bottom: 5px;margin-right: 5px; width:200px;">Test Overlay</button>
+              <button type="submit" class="btn btn-danger" value="0" onclick="javascript:terminateSubmit();" name="imijPortalHomeButton" id="imijPortalHomeButton" style="margin-bottom: 5px;margin-right: 5px; width:200px;">Terminate</button>
+            </p>
+            <p>
+              <label>WARNING:</label>&nbsp;Terminating will terminate the entire processing of the files.
+            </p>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+<!-- /.row -->
+{% endblock content %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block css %}
+
+{% endblock css%}
+{% block js %}
+<script type="text/javascript">
+
+$(document).ready(function(){
+});
+
+</script>
+{% endblock js %}
+{% block content %}
+<form action="/imijPortalApp/processData/"  method = "post" id = "submitUploadFileForm" >
+    {% csrf_token %}
+    <input type="hidden" value="{{uploadFile.id}}" name="uploadFileId" id ="uploadFileId"/>
+
+<div class="row">
+  <div class="col-lg-12">
+    <div class="panel-body">
+      <div class="">
+        <div class="row jumbotron" style = "text-align:left;">
+
+	         <p>File <b>{{uploadFile.name}}</b> uploaded.</p>
+
+    	    <p><label>Checksum:&nbsp;</label>{{chksum}} </p>
+
+          <p>
+      		  <button type="submit" class="btn btn-primary" value = "0" name = "imijPortalHomeButton" id = "imijPortalHomeButton" style="margin-bottom: 5px;margin-right: 5px; width:200px;">Process Data</button>
+      		</p>
+
+</div>
+</form>
+<!-- /.row -->
+{% endblock content %}

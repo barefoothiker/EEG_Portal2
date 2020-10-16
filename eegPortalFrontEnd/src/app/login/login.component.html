@@ -1,0 +1,38 @@
+<div class="login-page">
+  <!-- <div class="login-page" [@routerTransition]> -->
+    <div class="row justify-content-md-center">
+        <div class="col-md-4">
+            <img src="assets/images/chronux_logo.png" width="150px" />
+            <h1>EEG Portal</h1>
+            <form role="form">
+                <div class="form-content">
+                    <div class="form-group">
+                        <input type="text"  [(ngModel)]="loggedInUser" [ngModelOptions]="{standalone: true}"  class="form-control input-underline input-lg" id="loggedInUserEmail" placeholder="User Name">
+                    </div>
+                    <div class="form-group">
+                        <input type="password"  [(ngModel)]="loggedInPass"  [ngModelOptions]="{standalone: true}"  class="form-control input-underline input-lg" id="loggedInUserPassword" placeholder="Password">
+                    </div>
+                </div>
+                <a class="btn rounded-btn" [routerLink]="['/dashboard']" (click)="onLoggedin()" (keydown)="submitEnter($event)"> Log in </a>
+                &nbsp;
+                <a class="btn rounded-btn" [routerLink]="['/signup']">Register</a>
+            </form>
+            <br/><br/>
+            <div >
+              Forgot Password? Click   <a [routerLink]="['/email-resetpasswordlink']">here.</a>.
+            </div>
+            <!-- <br/><br/>
+            <div >
+              Reset Password? Click   <a [routerLink]="['/reset-password', userid]">here.</a>.
+            </div> -->
+
+            <div class="alert alert-success" role="alert" *ngIf="message">
+              {{message}}
+            </div>
+            <!-- <div >
+              Copyright<i class="fa fa-copyright"></i> Imij Inc. Please read our <a href="#">privacy policy</a>.
+            </div> -->
+
+        </div>
+    </div>
+</div>

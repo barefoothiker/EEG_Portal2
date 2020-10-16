@@ -1,0 +1,457 @@
+<div class="container">
+		<!-- <div class="row" class="col-sm-12" *ngIf="datafile"> -->
+			<div class="row" class="col-sm-12" *ngIf="analysisDetail">
+			<br/>
+			<br/>
+			<br/>
+			<br/>
+				<div class="form-group" >
+					<p style='font-weight: bold; font-size: 18px;' *ngIf="datafile">Analysis result for {{datafile.name}}</p>
+				</div>
+				<div  *ngIf="analysisDetail">
+					<div class="btn-group">
+						<button  id="button_0" style = "background-color:#834793;" (click)="showHideFilters();" *ngIf="showFiltersFlag">Hide Params&nbsp;<i class="fa fa-angle-double-up" aria-hidden="true"></i>
+							</button>&nbsp;
+						<button  id="button_0" style = "background-color:#834793;" (click)="showHideFilters();" *ngIf="!showFiltersFlag">Show Params&nbsp;<i class="fa fa-angle-double-down" aria-hidden="true"></i>
+						</button>&nbsp;
+						<!-- <div  class="mt-2 col-md-12"> -->
+								<b>Auto-Increment (in step size seconds):</b>
+								<input type="checkbox" [(ngModel)]="autoIncrementFlag" [ngModelOptions]="{standalone: true}" id="autoIncrementFlag" (click)="setAutoIncrementFlag()">
+						<!-- </div> -->
+					</div>
+					<br/>
+					<div *ngIf="showFiltersFlag" style="border: 2px dashed;padding:5px;float:clear;" class="row">
+
+					<div class="mt-2 col-md-12 custom-slider" style="float:clear;">
+						<ng5-slider [(value)]="lowerTimeLimit" [(highValue)]="upperTimeLimit" [options]="rangeSliderOptions" (valueChange)="sliderValueChange($event)"> </ng5-slider>
+					</div>
+
+					<div class="mt-2 col-md-12" style="float:clear;">
+						<b>Select Channels:</b>
+					<fieldset>
+						<div *ngFor="let channelObj of channelObjs" style="float:left;">
+							<input type="checkbox" [checked] = "channelObj.isSelected" [(ngModel)]="channelObj.isSelected" [ngModelOptions]="{standalone: true}">&nbsp;
+							{{channelObj.channelLabel}},&nbsp;
+						</div>
+					</fieldset>
+				</div>
+
+				<div  class="mt-2 col-md-12">
+						<b>Sampling Frequency:</b>
+						<input type="text" [(ngModel)]="analysisDetail.samplingFrequency" [ngModelOptions]="{standalone: true}" id="samplingFrequency">
+				</div>
+
+				<div  class="mt-2 col-md-12">
+						<b>Time BandWidth (in seconds):</b>
+						<input type="text" min="0" max="100" [(ngModel)]="analysisDetail.timeBandWidth" [ngModelOptions]="{standalone: true}" id="timeBandWidthId" >
+				</div>
+				<div  class="mt-2 col-md-12">
+						<b>Num Tapers:</b>
+						<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.numTapers" [ngModelOptions]="{standalone: true}" id="numTapersId" >
+				</div>
+				<div  class="mt-2 col-md-12">
+						<b>Step Size (in seconds):</b>
+						<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.stepSize" [ngModelOptions]="{standalone: true}" id="numTapersId" >
+				</div>
+				<div  class="mt-2 col-md-12">
+						<b>Window Size (in seconds):</b>
+						<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.timeWindow" [ngModelOptions]="{standalone: true}" id="numTapersId" >
+				</div>
+				<div  class="mt-2 col-md-12">
+						<b>Lower Frequency:</b>
+						<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.lowerFrequency" [ngModelOptions]="{standalone: true}" id="lowerFrequency" >
+				</div>
+				<div  class="mt-2 col-md-12">
+						<b>Upper Frequency:</b>
+						<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.upperFrequency" [ngModelOptions]="{standalone: true}" id="upperFrequency" >
+				</div>
+
+				<div  class="mt-2 col-md-12">
+						<b>Compute PSD:</b>
+						<input type="checkbox" [checked] = "computePSDlag" [(ngModel)]="computePSDFlag" [ngModelOptions]="{standalone: true}">
+				</div>
+
+				<div class="mt-2 col-md-12">
+						<b>Compute Cross-Correlation:</b>
+						<input type="checkbox" [checked] = "computeCrossCorrelationFlag" [(ngModel)]="computeCrossCorrelationFlag" [ngModelOptions]="{standalone: true}">&nbsp;
+						<b>Compute PAC:</b>
+						<input type="checkbox" [checked] = "computePACFlag" [(ngModel)]="computePACFlag" [ngModelOptions]="{standalone: true}">&nbsp;
+						<b>Compute PLV:</b>
+						<input type="checkbox" [checked] = "computePLVFlag" [(ngModel)]="computePLVFlag" [ngModelOptions]="{standalone: true}">&nbsp;
+				</div>
+
+				<div class="mt-2 col-md-12">
+						<b>Select Channel 1:</b>
+						<div class="row">
+	            <div class="col">
+	              <div ngbDropdown class="d-inline-block">
+	                <button class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>{{analysisDetail.channel1}}</button>
+	                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+	                  <button ngbDropdownItem *ngFor="let channelObj of datafile.channelObjs" (click) = "setChannel1 ( channelObj.channelLabel)" [value]="channelObj.channelLabel" [style.background-color] = "channelObj.rowColor" >{{ channelObj.channelLabel }}</button>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+						&nbsp;
+						<b>Select Channel 2:</b>
+						<div class="row">
+	            <div class="col">
+	              <div ngbDropdown class="d-inline-block">
+	                <button class="btn btn-outline-primary" id="dropdownBasic1" ngbDropdownToggle>{{analysisDetail.channel2}}</button>
+	                <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+	                  <button ngbDropdownItem *ngFor="let channelObj of datafile.channelObjs" (click) = "setChannel2 ( channelObj.channelLabel)" [value]="channelObj.channelLabel" [style.background-color] = "channelObj.rowColor" >{{ channelObj.channelLabel }}</button>
+	                </div>
+	              </div>
+	            </div>
+	          </div>
+				</div>
+
+				<ngb-tabset type="pills" [activeId]="activeTabTitle">
+					<ngb-tab *ngIf = "analysisDetail.pacParams" title="PAC" id="PAC" name="PAC">
+						<ng-template ngbTabContent>
+							<div style="border: 2px dashed;">
+								<div  class="mt-2 col-md-12">
+										<b>L Cut:</b>
+										<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.pacParams.lcut" [ngModelOptions]="{standalone: true}" id="pacLcutId" >
+								</div>
+								<div  class="mt-2 col-md-12">
+										<b>H Cut:</b>
+										<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.pacParams.hcut" [ngModelOptions]="{standalone: true}" id="pacHcutId" >
+								</div>
+								<!-- <div  class="mt-2 col-md-12">
+										<b>Sample Rate:</b>
+										<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.pacParams.sampleRate" [ngModelOptions]="{standalone: true}" id="pacSampleRateId" >
+								</div> -->
+								<div  class="mt-2 col-md-12">
+										<b>Ripple DB:</b>
+										<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.pacParams.rippleDB" [ngModelOptions]="{standalone: true}" id="pacRippleDBId" >
+								</div>
+								<div  class="mt-2 col-md-12">
+										<b>Band Width:</b>
+										<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.pacParams.bandwidth" [ngModelOptions]="{standalone: true}" id="pacBwId" >
+								</div>
+								<div  class="mt-2 col-md-12">
+										<b>AttenHz:</b>
+										<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.pacParams.attenHz" [ngModelOptions]="{standalone: true}" id="pacAttenHzId" >
+								</div>
+							</div>
+						</ng-template>
+					</ngb-tab>
+					<ngb-tab *ngIf = "analysisDetail.plvParams" title="PLV" id="PLVId" name="PLV">
+						<ng-template ngbTabContent>
+							<div style="border: 2px dashed;">
+								<div  class="mt-2 col-md-12">
+										<b>L Cut:</b>
+										<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.plvParams.lcut" [ngModelOptions]="{standalone: true}" id="plvLcutId" >
+								</div>
+								<div  class="mt-2 col-md-12">
+										<b>H Cut:</b>
+										<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.plvParams.hcut" [ngModelOptions]="{standalone: true}" id="plvHcutId" >
+								</div>
+								<div  class="mt-2 col-md-12">
+										<b>Ripple DB:</b>
+										<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.plvParams.rippleDB" [ngModelOptions]="{standalone: true}" id="plvRippleDBId" >
+								</div>
+								<div  class="mt-2 col-md-12">
+										<b>Band Width:</b>
+										<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.plvParams.bandWidth" [ngModelOptions]="{standalone: true}" id="plvBwId" >
+								</div>
+								<div  class="mt-2 col-md-12">
+										<b>AttenHz:</b>
+										<input type="text" min="0" max="10" [(ngModel)]="analysisDetail.plvParams.attenHz" [ngModelOptions]="{standalone: true}" id="plvAttenHzId" >
+								</div>
+							</div>
+						</ng-template>
+					</ngb-tab>
+				</ngb-tabset>
+
+				<div  class="mt-2 col-md-12">
+
+				<div class="btn-group">
+					<button  id="button_0" style = "background-color:#834793;" (click)="submitAnalysis();">Submit&nbsp;
+						</button>&nbsp;
+				</div>
+
+			</div>
+			  </div>
+				<br/>
+				<div style="overflow:auto">
+					<ngb-tabset type="pills" [activeId]="activeTabTitle">
+				  <!-- <ngb-tab title="Raw_Data" id="Raw_Data" name="Raw_Data">
+				    <ng-template ngbTabContent>
+							<div style="border: 2px dashed;"> -->
+								<!-- <canvas baseChart width="400" height="300"
+						                [datasets]="lineChartData"
+						                [labels]="lineChartLabels"
+						                [options]="lineChartOptions"
+						                [colors]="lineChartColors"
+						                [legend]="lineChartLegend"
+						                [chartType]="lineChartType"
+						                [plugins]="lineChartPlugins"
+														></canvas> -->
+							<!-- </div>
+						</ng-template>
+				  </ngb-tab> -->
+
+				  <!-- <ngb-tab title="PSD" id="PSD" name="PSD">
+				    <ng-template ngbTabContent>
+							<div style="border: 2px dashed;">
+								<canvas baseChart width="400" height="100"
+						                [datasets]="psdLineChartData"
+						                [labels]="psdLineChartLabels"
+						                [options]="lineChartOptions"
+						                [colors]="lineChartColors"
+						                [legend]="lineChartLegend"
+						                [chartType]="lineChartType"
+						                [plugins]="lineChartPlugins"
+														></canvas>
+							</div>
+				    </ng-template>
+				  </ngb-tab>
+ -->
+					<ngb-tab title="Spectral analysis" id="Spectrogram" name="Spectrogram">
+						<ng-template ngbTabContent>
+							<div style="border: 2px dashed;">
+
+								<table width="100%">
+									<tr>
+										<td width="50%">
+											<div style="display: block;text-align:center;">
+												<b>Raw Trace</b>
+													<canvas baseChart width="200" height="150"
+											                [datasets]="lineChartData"
+											                [labels]="lineChartLabels"
+											                [options]="lineChartOptions"
+											                [colors]="lineChartColors"
+											                [legend]="lineChartLegend"
+											                [chartType]="lineChartType"
+											                [plugins]="lineChartPlugins"
+																			>
+													</canvas>
+												</div>
+										</td>
+										<td width="50%">
+
+											<div style="display: block;text-align:center;">
+												<b>Spectral Band Power</b>
+												<canvas baseChart
+													[datasets]="barChartData"
+													[labels]="barChartLabels"
+													[options]="barChartOptions"
+													[colors]="barChartColors"
+													[plugins]="barChartPlugins"
+													[legend]="barChartLegend"
+													[chartType]="barChartType">
+												</canvas>
+												&nbsp;
+
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td width="50%">
+											<div style="display: block;text-align:center;">
+												<b>Power Spectral Density</b>
+											<canvas baseChart width="200" height="130"
+									                [datasets]="psdLineChartData"
+									                [labels]="psdLineChartLabels"
+									                [options]="lineChartOptions"
+									                [colors]="lineChartColors"
+									                [legend]="lineChartLegend"
+									                [chartType]="lineChartType"
+									                [plugins]="lineChartPlugins"
+																	></canvas>
+												</div>
+										</td>
+										<td width="50%">
+											<!-- <div *ngFor="let spectrogramData of spectrogramDataList" style="display: flex; overflow: hidden;float:clear;height:50px" [style.height]=""> -->
+											<!-- <div *ngFor="let spectrogramData of spectrogramDataList" style="display: flex; overflow: hidden;height:80px"> -->
+												<b>Spectrogram</b>
+
+												<ngx-charts-heat-map
+										      [view]=""
+										      [scheme]="colorScheme"
+										      [results]="multi"
+													[innerPadding]="innerPadding"
+										      [legend]="showLegend"
+										      [gradient]="gradient"
+										      [xAxis]="hideXAxis"
+										      [yAxis]="showYAxis"
+										      [showXAxisLabel]="showXAxisLabel"
+										      [showYAxisLabel]="showYAxisLabel"
+										      [xAxisLabel]="xAxisLabel"
+										      [yAxisLabel]="yAxisLabel"
+										      (select)="onSelect($event)">
+										    </ngx-charts-heat-map>
+										</td>
+									</tr>
+
+								</table>
+
+							</div>
+				    </ng-template>
+				  </ngb-tab>
+					<ngb-tab title="Cross Spectrogram" id="Cross-Spectrogram" name="Cross-Spectrogram">
+						<ng-template ngbTabContent>
+							<div style="border: 2px dashed;">
+
+								<table width="100%">
+									<tr>
+										<td width="50%">
+											<div style="display: block;text-align:center;">
+												<b>Raw Data</b>
+
+											<canvas baseChart width="200" height="150"
+									                [datasets]="lineChartData"
+									                [labels]="lineChartLabels"
+									                [options]="lineChartOptions"
+									                [colors]="lineChartColors"
+									                [legend]="lineChartLegend"
+									                [chartType]="lineChartType"
+									                [plugins]="lineChartPlugins"
+																	></canvas>
+												</div>
+										</td>
+										<td width="50%">
+											<div style="display: block;text-align:center;">
+												<b>Phase Amplitude Coupling</b>
+													<canvas baseChart width="200" height="130"
+										                [datasets]="pacLineChartData"
+										                [labels]="pacLineChartLabels"
+										                [options]="lineChartOptions"
+										                [colors]="lineChartColors"
+										                [legend]="lineChartLegend"
+										                [chartType]="lineChartType"
+										                [plugins]="lineChartPlugins"
+																		></canvas>
+
+											</div>
+										</td>
+									</tr>
+
+									<tr>
+										<td width="50%">
+
+												<div style="display: block;text-align:center;">
+													<b>Phase Lag Variance</b>
+
+											<canvas baseChart width="200" height="130"
+																	[datasets]="plvLineChartData"
+																	[labels]="plvLineChartLabels"
+																	[options]="lineChartOptions"
+																	[colors]="lineChartColors"
+																	[legend]="lineChartLegend"
+																	[chartType]="lineChartType"
+																	[plugins]="lineChartPlugins"
+																	></canvas>
+												</div>
+										</td>
+										<td width="50%">
+												<b>Cross Spectrogram</b>
+
+											<ngx-charts-heat-map
+												[view]=""
+												[scheme]="colorScheme"
+												[results]="crossSpectrogramData"
+												[innerPadding]="innerPadding"
+												[legend]="showLegend"
+												[gradient]="gradient"
+												[xAxis]="hideXAxis"
+												[yAxis]="showYAxis"
+												[showXAxisLabel]="showXAxisLabel"
+												[showYAxisLabel]="showYAxisLabel"
+												[xAxisLabel]="xAxisLabel"
+												[yAxisLabel]="yAxisLabel"
+												(select)="onSelect($event)">
+											</ngx-charts-heat-map>
+
+										</td>
+									</tr>
+
+								</table>
+
+							</div>
+				    </ng-template>
+				  </ngb-tab>
+
+					<!-- <ngb-tab title="Spectrogram" id="Spectrogram" name="Spectrogram">
+						<ng-template ngbTabContent>
+							<div style="border: 2px dashed;height:500px;"> -->
+
+								<!-- <div id = "spectrogramDiv" style="position:relative;display: inline-block;vertical-align:top;" >
+							</div> -->
+							<!-- <div *ngFor="let spectrogramImagePath of spectrogramImagePaths" style="overflow:auto;">
+
+							<img [src] =  "spectrogramImagePath" width="800px;" height="300px;">
+
+						</div> -->
+
+								<!-- <div *ngFor="let spectrogramData of spectrogramDataList" style="float:clear;"> -->
+									<!-- <ngx-charts-heat-map
+							      [view]="view"
+							      [scheme]="colorScheme"
+							      [results]="multi"
+										[innerPadding]="innerPadding"
+							      [legend]="showLegend"
+							      [gradient]="gradient"
+										[borderRadius]="borderRadius"
+							      [xAxis]="hideXAxis"
+							      [yAxis]="hideYAxis"
+							      [showXAxisLabel]="showXAxisLabel"
+							      [showYAxisLabel]="showYAxisLabel"
+							      [xAxisLabel]="xAxisLabel"
+							      [yAxisLabel]="yAxisLabel"
+							      (select)="onSelect($event)">
+							    </ngx-charts-heat-map> -->
+								<!-- </div> -->
+
+							<!-- </div>
+				    </ng-template>
+				  </ngb-tab> -->
+
+					<!-- <ngb-tab  title="PAC" id="PAC" name="PAC">
+						<ng-template ngbTabContent>
+
+								<div style="border: 2px dashed;">
+									<canvas baseChart width="400" height="100"
+							                [datasets]="pacLineChartData"
+							                [labels]="pacLineChartLabels"
+							                [options]="lineChartOptions"
+							                [colors]="lineChartColors"
+							                [legend]="lineChartLegend"
+							                [chartType]="lineChartType"
+							                [plugins]="lineChartPlugins"
+															></canvas>
+								</div>
+
+				    </ng-template>
+				  </ngb-tab>
+
+					<ngb-tab  title="PLV" id="PLV" name="PLV">
+						<ng-template ngbTabContent>
+
+								<div style="border: 2px dashed;">
+									<canvas baseChart width="400" height="100"
+							                [datasets]="plvLineChartData"
+							                [labels]="plvLineChartLabels"
+							                [options]="lineChartOptions"
+							                [colors]="lineChartColors"
+							                [legend]="lineChartLegend"
+							                [chartType]="lineChartType"
+							                [plugins]="lineChartPlugins"
+															></canvas>
+								</div>
+
+				    </ng-template>
+				  </ngb-tab> -->
+
+				</ngb-tabset>
+			</div>
+
+		</div>
+		<!-- <div id = "spectrogramDiv" style="position:relative;display: inline-block;vertical-align:top;" [style.width.px] = "spectrogramWidth" [style.height.px] = "spectrogramHeight">
+		</div>		 -->
+		<div id = "spectrogramDiv" style="position:relative;display: inline-block;vertical-align:top;" style="width:1200px;height:300px;">
+		</div>
+
+</div>

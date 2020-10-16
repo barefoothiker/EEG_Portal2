@@ -1,0 +1,66 @@
+<!-- <div class="login-page" [@routerTransition]> -->
+  <div class="login-page">
+
+    <div class="row justify-content-md-center">
+        <div class="col-md-4">
+            <img class="user-avatar" src="assets/images/chronux_logo.png" width="150px" />
+            <h1>Imij Portal</h1>
+            <form role="form">
+                <div class="form-content">
+
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="username" [ngModelOptions]="{standalone: true}"  class="form-control input-underline input-lg" id="username" placeholder="User Name"  (keyup)="checkUser()" required>
+                    </div>
+
+                    <div class="form-group">
+                      <!-- <input type="email" [(ngModel)]="email" [ngModelOptions]="{standalone: true}"  class="form-control input-underline input-lg" id="email" placeholder="Email" (keyup)="checkEmail()"> -->
+                      <input type="email"  [(ngModel)]="email" [ngModelOptions]="{standalone: true}"  class="form-control input-underline input-lg" id="email" (keyup)="checkEmail()" placeholder="Email" required>
+
+                    </div>
+
+                    <div class="form-group">
+                      <input type="password"  [(ngModel)]="password" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="password" placeholder="Password" required>
+                    </div>
+                    Password Strength:&nbsp; <password-strength-meter [password]="password"></password-strength-meter>
+                    <div class="form-group">
+                        <input type="password" [(ngModel)]="repeatPassword" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="repeatPassword" placeholder="Repeat Password"
+                         (keyup)="checkPassword()" required>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="addressLine1" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="addressLine1" placeholder="Address Line 1">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="addressLine2" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="addressLine2" placeholder="Address Line 2">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="city" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="city" placeholder="City">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="state" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="state" maxlength="2" placeholder="State">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="zipCode" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="zipCode" maxlength="12" placeholder="Zip Code">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" [(ngModel)]="phoneNumber" [ngModelOptions]="{standalone: true}" class="form-control input-underline input-lg" id="phoneNumber" maxlength="12" placeholder="Phone Number">
+                    </div>
+
+                <a *ngIf="disableRegister" class="btn rounded-btn"  > Register </a>&nbsp;
+                <a *ngIf="!disableRegister" class="btn rounded-btn" (click)="registerUser()" > Register </a>&nbsp;
+
+                <a class="btn rounded-btn" [routerLink]="['/login']"> Log in </a>
+              </div>
+
+            </form>
+            <!-- <br/> -->
+            <div class="alert alert-success" role="alert" *ngIf="message">
+              {{message}}
+            </div>
+            <br/>
+            <!-- <div >
+              Copyright<i class="fa fa-copyright"></i> Imij Inc. Please read our <a href="#">privacy policy</a>.
+            </div> -->
+        </div>
+    </div>
+</div>

@@ -1,0 +1,112 @@
+.grid-container {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-gap: 10px;
+  background-color: #2196F3;
+  padding: 10px;
+}
+
+.grid-container > div {
+  background-color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  padding: 20px 0;
+  font-size: 30px;
+}
+
+.grid-item1 {
+  grid-row: 1 / span 2;
+}
+
+.full-screen-clearfix-left{
+clear:left;
+}
+.full-screen-clearfix-both{
+clear:both;
+}
+
+.full-screen-modal {
+  height: 100vh;
+  width: 100vw !important;
+  max-width: none !important;
+}
+
+.modal-hidden{
+    display:none;
+}
+.modal-show{
+    display:block;
+}
+
+#modal-container {
+    position:  fixed;
+    // top: 300px;
+    // left: 50%;
+    // width: 375px;
+    width: 100%;
+    background: white;
+    // margin-left: -187.5px;
+    text-align: center;
+    box-shadow: 0px 0px 2px 1px black;
+    z-index: 100;
+}
+
+#modal-overlay {
+    position: absolute;
+    top: 0px;
+    left:  0px;
+    z-index:  99;
+    background:  rgba(0,0,0,0.8);
+    width:  100%;
+    height: 100%;
+}
+
+/* MODAL STYLES
+-------------------------------*/
+jw-modal {
+    /* modals are hidden by default */
+    display: none;
+
+    .jw-modal {
+        /* modal container fixed across whole screen */
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        /* z-index must be higher than .jw-modal-background */
+        z-index: 1000;
+
+        /* enables scrolling for tall modals */
+        overflow: auto;
+
+        .jw-modal-body {
+            padding: 20px;
+            background: #fff;
+
+            /* margin exposes part of the modal background */
+            margin: 40px;
+        }
+    }
+
+    .jw-modal-background {
+        /* modal background fixed across whole screen */
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        /* semi-transparent black  */
+        background-color: #000;
+        opacity: 0.75;
+
+        /* z-index must be below .jw-modal and above everything else  */
+        z-index: 900;
+    }
+}
+
+body.jw-modal-open {
+    /* body overflow is hidden to hide main scrollbar when modal window is open */
+    overflow: hidden;
+}

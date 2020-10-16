@@ -1,0 +1,146 @@
+<div class="modal-dialog modal-lg">
+  <div class="modal-content">
+  <div class="modal-header">
+    <h4 class="modal-title">Params</h4>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+
+  <div class="modal-body" >
+
+    <div style="width: 100% !important;pointer-events:auto;">
+
+    <!-- <div id="spacerDiv" *ngIf="showParamsFlag"> -->
+      <!-- <br/> -->
+    <!-- </div> -->
+    <!-- <div id="paramsDiv" *ngIf="showParamsFlag" style="border: 2px dashed;padding:5px;background-color: white;"> -->
+
+      <div class="btn-group" >
+
+        <!-- <button  *ngIf = "originalScanEnabled" [style.background-color] = "originalScanButtonBackgroundColor" id="imageClassButton_0" (click)="changeImageClass(0);" disabled="disableOriginalScanFlag">Original Scan&nbsp;</button>
+        <button  *ngIf = "brainExtractionEnabled" [style.background-color] = "brainExtractionButtonBackgroundColor"  id="imageClassButton_1" (click)="changeImageClass(1);" disabled="disableBrainExtractionFlag">Brain Extraction&nbsp;</button> -->
+
+        <button  *ngIf = "originalScanEnabled" [style.background-color] = "originalScanButtonBackgroundColor" id="imageClassButton_0" (click)="changeImageClass(0);">Original Scan&nbsp;</button>
+        <button  *ngIf = "brainExtractionEnabled" [style.background-color] = "brainExtractionButtonBackgroundColor"  id="imageClassButton_1" (click)="changeImageClass(1);">Brain Extraction&nbsp;</button>
+
+        <div *ngIf = "originalScanEnabled">
+          <button  *ngIf = "!brainExtractionEnabled" style = "background-color:#C0C0C0;" id="imageClassButton_1" disabled >Brain_Extraction&nbsp;</button>
+        </div>
+
+        <div id="spacerDiv" >
+          {{uploadFolder.name}}
+        </div>
+
+      <!-- </div> -->
+
+      <div id="spacerDiv2" class = "row" *ngIf="loadingDataFlag" style="max-width: 250px;float:left;font-size:24px;font-weight:bold;" >
+        Loading ...
+      </div>
+
+      <!-- <i *ngIf="originalScanEnabled" class="fa fa-question-circle" aria-hidden="true" (click)="openModal('helpImageClass')"></i>
+      <div style="float:right;" *ngIf="originalScanEnabled"><a (click)="downloadPDF();"><i class="fa fa-file-pdf-o" style="font-size:18px"></i></a></div> -->
+      <br/>
+
+      <div style="max-width: 100%;" *ngIf="displayRoiFlag" >
+          <caption>Regions:</caption>
+
+          <ng-multiselect-dropdown
+            [placeholder]="'Regions of Interest'"
+            [settings]="dropdownSettings"
+            [data]="dropdownList"
+            [(ngModel)]="selectedRegionsList"
+            [ngModelOptions]="{standalone: true}"
+            (onSelect)="onRegionSelect($event)"
+            (onDeSelect)="onRegionDeSelect($event)"
+            (onSelectAll)="onSelectAll($event)">
+          </ng-multiselect-dropdown>
+
+          <br/>
+      </div>
+
+      <div style=" max-width: 250px;clear:both;" *ngIf="displayRoiFlag" >
+          ROI Overlay Slider:&nbsp;<i *ngIf="originalScanEnabled" class="fa fa-question-circle" aria-hidden="true"></i>
+          <div class="slidecontainer" style="float:left;">
+            <input type="range" min="0" max="100" value="{{roiSliderValue}}" class="slider" id="roiSlider" (input)="setRoiSliderValue();">
+            <div>Slider Value: {{roiSliderValue}}</div>
+          </div>&nbsp;
+          <br/>
+          <br/>
+      </div>
+
+      <div style="max-width: 100%;clear:both;" *ngIf="displaySaliencyFlag">
+        <br/>
+        <div style="max-width: 100%;clear:both;" *ngIf="saliencyDataFlag">
+            <label id="saliencyMap">
+              <input type="checkbox" [checked] = "saliencyMapSelected" (change)="displaySaliencyMap();" [(ngModel)]="saliencyMapSelected" [ngModelOptions]="{standalone: true}" [disabled] = "disableSelection">Overlay Saliency Map&nbsp;
+            </label>
+            <div *ngIf = "saliencyMapSelected">
+              <button *ngFor = "let saliencyData of saliencyDataList; let selectedSaliencyDataIndex = index" [attr.data-index]="selectedSaliencyDataIndex" (click) = "setSaliencyData(selectedSaliencyDataIndex)"
+                       [style.background-color] = "saliencyData.buttonColor" >{{saliencyData.description}}</button>&nbsp;
+            </div>
+            <div *ngIf="regionsSelected" style="position:relative;">
+              <label id="totalVoxels">
+                <input type="checkbox" [checked] = "totalVoxelsSelected" [(ngModel)]="totalVoxelsSelected" [ngModelOptions]="{standalone: true}" [disabled] = "disableLineChartsSelection">Show Total Voxels&nbsp;
+              </label>
+              <label id="thresholdProportional">
+                <input type="checkbox" [checked] = "thresholdProportionalSelected" [(ngModel)]="thresholdProportionalSelected" [ngModelOptions]="{standalone: true}" [disabled] = "disableLineChartsSelection">Show Threshold Proportional&nbsp;
+              </label>
+              <label id="zmBin">
+                <input type="checkbox" [checked] = "zmBinSelected" [(ngModel)]="zmBinSelected" [ngModelOptions]="{standalone: true}" [disabled] = "disableLineChartsSelection">Show ZM Bin&nbsp;
+              </label>&nbsp;
+              <i *ngIf="originalScanEnabled" class="fa fa-question-circle" aria-hidden="true"></i>
+            </div>
+        </div>
+        <div style=" max-width: 250px;" *ngIf="saliencyDataFlag">
+
+            Saliency Map Slider:&nbsp;<i *ngIf="originalScanEnabled" class="fa fa-question-circle" aria-hidden="true"></i>
+
+            <div class="slidecontainer" style="float:left;">
+              <input type="range" min="0" max="100" value="{{this.saliencyMapSliderValue}}" class="slider" id="saliencyMapSlider" (input)="setSaliencyMapSliderValue();" [disabled]="disableSaliencySlider">
+              <div>Slider Value: {{saliencyMapSliderValue}}</div>
+            </div>
+
+            <div *ngIf = "saliencyMapSelected" class="slidecontainer" style="float:left;">
+
+              Select Saliency Color:&nbsp;
+              <input [(colorPicker)]="selectedSaliencyColor" [style.background]="selectedSaliencyColor" [(ngModel)]="selectedSaliencyColor" [ngModelOptions]="{standalone: true}" (colorPickerChange) = "setSaliencyColor()" (colorPickerSelect) = "setSaliencyColor()"  />
+            </div>
+
+        </div>
+
+
+      </div>
+
+      <div  class="btn-group" style="margin-left:1px;" >
+        <button  id="button_0_0" [style.background-color] = "defaultButtonColor" (click)="changeView(0);" >Coronal</button>
+        <button  id="button_1_1" [style.background-color] = "unSelectedDefaultButtonColor" (click)="changeView(1);" >Axial</button>
+        <button  id="button_2_2"  [style.background-color] = "unSelectedDefaultButtonColor" (click)="changeView(2);" >Sagittal</button>&nbsp;
+        <button  id="button_center" [style.background-color] = "unSelectedDefaultButtonColor"  (click)="gotoCenter();" style="width:90%" >Center</button>&nbsp;
+        <!-- <button type="button" class="btn btn-secondary" (click)="filterComments(0)" [style.background-color] = "commentsFilterButtonColor_0" value="Usr" id="commentsFilterButton_0" formcontrolName="commentTypeSel">User</button>
+        <button type="button" class="btn btn-secondary" (click)="filterComments(1)" [style.background-color] = "commentsFilterButtonColor_1" value="Alg" id="commentsFilterButton_1" formcontrolName="commentTypeSel">Auto</button>
+        <button type="button" class="btn btn-secondary" (click)="filterComments(2)" [style.background-color] = "commentsFilterButtonColor_2" value="All" id="commentsFilterButton_2" formcontrolName="commentTypeSel">All</button> -->
+        &nbsp;
+        <!-- <i *ngIf="originalScanEnabled" class="fa fa-question-circle" aria-hidden="true" (click)="openModal('helpSearchType')"></i>&nbsp; -->
+        <i *ngIf="originalScanEnabled" aria-hidden="true" class="fa fa-plus" aria-hidden="true" (click)="showHideCrossHairs()"></i>
+        <i *ngIf="originalScanEnabled" aria-hidden="true" class="fa fa-undo" aria-hidden="true" (click)="resetBrightnessContrast()"></i>&nbsp;
+
+      </div>
+
+      <br/>
+      <br/>
+
+      </div>
+      <!-- <div style="font-size:24px;font-weight:bold;"  *ngIf = "originalScanEnabled" >PD Score:<font color="red">{{pdScore}}</font></div>
+
+      </div> -->
+    </div>
+
+
+    </div>
+    <div class="modal-footer">
+      <!-- <button *ngIf="allowAddComment" type="button" class="btn btn-outline-dark" (click)="submitForm()" [disabled]="disableSubmit">Submit</button>&nbsp;&nbsp; -->
+      <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
+    </div>
+  <!-- </div> -->
+</div>

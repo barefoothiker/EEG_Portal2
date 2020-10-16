@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block css %}
+
+{% endblock css%}
+{% block js %}
+<script type="text/javascript">
+  $(document).ready(function() {});
+</script>
+{% endblock js %}
+{% block content %}
+<form action="/imijPortalApp/submitUploadFile/" enctype="multipart/form-data" method="post" id="landingForm">
+  {% csrf_token %}
+
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="panel-body">
+        <div class="">
+          <div class="row jumbotron" style="text-align:left;">
+            <p> Welcome to the IMIJ Portal</p>
+
+            <p>{{form_p}}</p>
+
+            <p>Select file:&nbsp;<input type="file" name="fileName" id="fileName" /></p>
+
+            <div>
+              <table border="0" style="text-align:center;" cellspacing="5" cellpadding="5">
+                <tr>
+                  <td>
+                    <button type="submit" class="btn btn-primary  " value="0" name="imijPortalHomeButton" id="imijPortalHomeButton" style="margin-bottom: 5px;margin-right: 5px; width:200px;">Submit Upload</button>
+                  </td>
+                </tr>
+
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /.col-lg-12 -->
+  </div>
+</form>
+<!-- /.row -->
+{% endblock content %}

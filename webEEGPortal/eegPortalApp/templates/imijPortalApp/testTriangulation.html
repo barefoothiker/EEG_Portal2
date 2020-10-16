@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block css %}
+<style>
+.rTable    { display: table; }
+.rTableRow       { display: table-row; }
+.rTableHeading    { display: table-header-group; font-weight:bold; text-align: center;}
+.rTableBody    { display: table-row-group; }
+.rTableFoot    { display: table-footer-group; }
+.rTableCell, .rTableHead  { display: table-cell; padding: 10px;}
+{% for imageObj in processObj.imageObjList %}
+#{{imageObj.imageName}}{position:relative;}
+#horizontal-{{imageObj.imageName}}{width:1px;height:100%;position:absolute;background-color:red;}
+#vertical-{{imageObj.imageName}}{width:100%;height:1px;position:absolute;background-color:red;}
+{% endfor %}
+</style>
+{% endblock css%}
+{% block js %}
+
+<script type="text/javascript">
+  $(document).ready(function() {
+
+    //set up the canvas and context
+    {% for imageObj in processObj.imageObjList %}
+
+      $('#img_{{imageObj.imageName}}').on('mousemove', null, [$('#horizontal-{{imageObj.imageName}}'), $('#vertical-{{imageObj.imageName}}')],function(e){
+
+        var offset = $(this).offset();
+
+        var X1 = e.pageX;
+        var Y1 = e.pageY;
+
+        e.data[1].css('left', X1 - e.offsetX);
+        e.data[1].css('top', Y1 );
+        e.data[1].css('width', parseFloat({{imageObj.imageWidth}}));
+        e.data[1].css('visibility', 'visible');
+
+        e.data[0].css('left', X1);
+        e.data[0].css('top', Y1 - e.offSetY);
+        e.data[0].css('height', parseFloat({{imageObj.imageHeight}}));
+        e.data[0].css('visibility', 'visible');
+
+        console.log(" mousemove " + e.pageX + ":" + e.pageY + "offset " + e.offsetX + ":" + e.offsetY + " X1 " + X1 + " Y1 " + Y1);
+
+      });
+      $('#{{imageObj.imageName}}').on('mouseenter', null, [$('#horizontal-{{imageObj.imageName}}'), $('#vertical-{{imageObj.imageName}}')], function(e){
+
+          console.log(" ************ mouseenter " + e.data)
+
+          e.data[0].show();
+          e.data[1].show();
+
+      }).on('mouseleave', null, [$('#horizontal-{{imageObj.imageName}}'), $('#vertical-{{imageObj.imageName}}')], function(e){
+
+              console.log(" ------------- mouseleave " + e.data)
+
+              e.data[0].hide();
+              e.data[1].hide();
+
+      }).on('click', null, [$('#horizontal-{{imageObj.imageName}}'), $('#vertical-{{imageObj.imageName}}')], function(e){
+
+              console.log(" ------------- mouseleave " + e.data)
+
+              e.preventDefault();
+              e.preventDefault();
+
+      });
+
+      $('#{{imageObj.imageName}}').on('dragstart', function(event) { event.preventDefault(); });
+
+      $("#{{imageObj.imageName}}")
+      .mousedown(function(e){
+          var isDragging = true;
+          $(this).on("mousemove",function(e){
+              if (isDragging) {
+              var imageName = e.target.id;
+              var uploadFileId = $("#uploadFileId").val();
+
+              var offset = $(this).offset();
+
+              var p1 = { x: e.pageX - offset.left, y: e.pageY - offset.top};
+              var p0 = $(this).data("p0") || p1;
+              console.log("dragging from x:" + p0.x + " y:" + p0.y + "to x:" + p1.x + " y:" + p1.y);
+              $(this).data("p0", p1);
+
+              $.ajax({
+                url: '/imijPortalApp/triangulateImageLowRes/',
+                data: {
+                  'uploadFileId': uploadFileId,
+                  'imageName': imageName,
+                  'X':p0.x,
+                  'Y':p0.y
+                },
+                dataType: 'json',
+                success: function (data) {
+                  // alert(data);
+                  // alert(data.slice);
+                  $.each(data.results, function(k, v) {
+                      //alert( " k = " + v.imageName + " v = " + v.imagePath);
+                      $("#"+ v.imageName).attr('src',"{% static "img/" %}" + v.imagePath);
+                  }); // end each
+                } // end success
+              }); // end ajax
+            } // if is dragging
+          }); // end mousemove
+      }) // end mousedown
+      .mouseup(function(){
+          $(this).off("mousemove");
+      });
+
+      $('#{{imageObj.imageName}}').click(function(e) {
+
+          var imageName = e.target.id;
+          var uploadFileId = $("#uploadFileId").val();
+
+          var offset = $(this).offset();
+
+          var X = (e.pageX - offset.left);
+          var Y = (e.pageY - offset.top);
+
+          $('#coord_{{imageObj.imageName}}').text('X: ' + X + ', Y: ' + Y);
+
+          $.ajax({
+            url: '/imijPortalApp/triangulateImage/',
+            data: {
+              'uploadFileId': uploadFileId,
+              'imageName': imageName,
+              'X':X,
+              'Y':Y
+            },
+            dataType: 'json',
+            success: function (data) {
+              // alert(data.imageName);
+              // alert(data.slice);
+              $.each(data.results, function(k, v) {
+                  //alert( " k = " + v.imageName + " v = " + v.imagePath);
+                  $("#"+ v.imageName).attr('src',"{% static "img/" %}" + v.imagePath);
+                  // alert($("#slice_" + v.imageName).text());
+                  // $("#slice_" + v.imageName).text(v.imagePath);
+              });
+            }
+          });
+      });
+    {% endfor %}
+
+  });
+
+</script>
+{% endblock js %}
+{% block content %}
+<form action="/imijPortalApp/processLanding/" enctype="multipart/form-data" method="post" id="landingForm">
+  {% csrf_token %}
+  <input type="hidden" value="{{uploadFile.id}}" name="uploadFileId" id ="uploadFileId"/>
+  <div class="rTable">
+      <div class="rTableHeading">
+        {% for imageObj in processObj.imageObjList %}
+          <div class="rTableCell rTableHeading">
+              <p>{{imageObj.imageType}}</p>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="rTableBody">
+        <div class="rTableRow">
+          {% for imageObj in processObj.imageObjList %}
+            <div class="rTableCell">
+                <p>
+                  <div id = "{{imageObj.imageName}}" style="position:static;">
+
+                    <div id="horizontal-{{imageObj.imageName}}" style="visibility:hidden;"></div>
+                    <div id="vertical-{{imageObj.imageName}}" style="visibility:hidden;"></div>
+
+                    <img id = "img_{{imageObj.imageName}}" src="{% static "img/" %}{{imageObj.imageName}}?{{datetimeNow}};" style="width:{{imageObj.imageWidth}}px;height:{{imageObj.imageHeight}}px;"/>
+
+                  </div>
+                  </p>
+            </div>
+          {% endfor %}
+        </div>
+        <div class="rTableRow">
+          {% for imageObj in processObj.imageObjList %}
+            <div class="rTableCell">
+                <p>
+                  <div id = "coord_{{imageObj.imageName}}"></div>
+                  </p>
+                  <p>
+                    <div id = "slice_{{imageObj.imageName}}"></div>
+                    </p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+</form>
+{% endblock content %}

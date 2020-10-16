@@ -1,0 +1,34 @@
+Number,Name,abbreviation,R,G,B,Hex
+4,Left LatVent,L_LatV,120,18,134,#781286
+9,Left Thalamus,L_Th,0,118,14,#00760E
+10,Left ThaLeft Prop,L_ThPro,0,118,14,#00760E
+11,Left caudate,L_Caud,122,186,220,#7ABADC
+12,Left Putamen,L_Put,236,13,176,#EC0DB0
+13,Left Pallidum,L_Pall,12,48,255,#0C30FF
+14,3rd Ventricle,Third_V,204,182,142,#CCB68E
+15,4th Ventricle,Fourth_V,42,204,164,#2ACCA4
+16,Brainstem,Bstem,119,159,176,#779FB0
+17,Left Hippocampus,L_Hipp,220,216,20,#DCD814
+18,Left Amygdala,L_Amy,103,255,255,#67FFFF
+19,Left Insula,L_Ins,80,196,98,#50C462
+20,Left Operculum,L_Oper,60,58,210,#3C3AD2
+25,Left Lesion,L_Le,255,165,0,#FFA500
+26,Left Acccumens,L_Acc,255,165,0,#FFA500
+27,Left Substancia_N,L_SN,0,255,127,#00FF7F
+28,Left VentralDC,L_VDC,165,42,42,#a52a2a
+43,Right LatVent,R_Lvent,120,18,134,#781286
+48,Right Thalamus,R_Th,0,118,14,#00760E
+49,Left ThaLeft Proper,R_ThPro,0,118,14,#00760E
+50,Right Caudate,R_Caud,122,186,220,#7ABADC
+51,Right Putamen,R_Put,236,13,176,#EC0DB0
+52,Right Pallidum,R_Pall,13,48,255,#0D30FF
+53,Right Hippocampus,R_Hipp,220,216,20,#DCD814
+54,Right Amygdala,R_Amy,103,255,255,#67FFFF
+55,Right Insula,R_Ins,80,196,98,#50C462
+56,Right Operculum,R_Oper,60,58,210,#3C3AD2
+57,Right Lesion,R_Le,255,165,0,#FFA500
+58,Right Acumbens,R_Acc,255,165,0,#FFA500
+59,Right Substancia_N,R_SN,0,255,127,#00FF7F
+60,Right VentralDC,R_VDC,165,42,42,#a52a2a
+1006,Left Entorhinal,L_Ent,220,20,10,#DC140A
+2006,Right Entorhinal,R_Ent,220,20,10,#DC140A

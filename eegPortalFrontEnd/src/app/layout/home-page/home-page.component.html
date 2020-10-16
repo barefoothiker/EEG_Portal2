@@ -1,0 +1,25 @@
+<div>
+    <div class="container">
+        <div class="row">
+            <div class="col-xl-4 col-lg-6">
+                <app-stat [bgClass]="'primary'" [icon]="'fa-tasks'" [count]="" [label]="'Upload Files'" [routerLink]="['/dashboard']"></app-stat>
+            </div>
+            <div class="col-xl-4 col-lg-6">
+                <app-stat [bgClass]="'warning'" [icon]="'fa-tasks'" [count]="" [label]="'List Files'" [routerLink]="['/list-datafiles']"></app-stat>
+            </div>
+            <!-- <div class="col-xl-4 col-lg-6">
+                <app-stat [bgClass]="'success'" [icon]="'fa-tasks'" [count]="" [label]="'View Results'" [routerLink]="['/brain-viewer']"></app-stat>
+            </div> -->
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-12">
+                <p style="text-align:center;">
+                  Welcome to the Imij Web Portal. Here you can upload MRI data files, submit for analysis, view results and monitor status of submitted jobs.
+                  <br/>
+                  If you would like to view the results of analysis using the brain viewer or monitor results of submission, please select from the list of files.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>

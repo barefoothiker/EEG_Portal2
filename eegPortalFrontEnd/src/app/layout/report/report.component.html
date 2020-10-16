@@ -1,0 +1,440 @@
+<div>
+	<br/>
+	<br/>
+		<div class="container" id="allContainer">
+			<div class = "row" style="max-width: 250px;float:left;font-size:24px;font-weight:bold;" *ngIf="!originalScanEnabled" >
+				Loading ..
+			</div>
+			<!-- <div id="spacerDiv2" class = "row" *ngIf="loadingDataFlag" style="max-width: 250px;float:left;font-size:24px;font-weight:bold;" >
+				Loading ...
+			</div>			 -->
+
+			<form role="form" [formGroup]="commentsSelFormGroup">
+				<!-- <form role="form" > -->
+				<fieldset class="form-group">
+
+					<div  *ngIf = "originalScanEnabled"  class="btn-group">
+						<button  id="button_0" style = "background-color:#834793;" (click)="showHideParams();" *ngIf="showParamsFlag">Hide Params&nbsp;<i class="fa fa-angle-double-up" aria-hidden="true"></i>
+							</button>&nbsp;
+						<button  id="button_0" style = "background-color:#834793;" (click)="showHideParams();" *ngIf="!showParamsFlag">Show Params&nbsp;<i class="fa fa-angle-double-down" aria-hidden="true"></i>
+						</button>&nbsp;
+					</div>
+					<div id="spacerDiv" *ngIf="showParamsFlag">
+						<!-- <br/> -->
+					</div>
+
+					<div id="paramsDiv" *ngIf="showParamsFlag" style="border: 2px dashed;padding:5px;">
+						<div class="btn-group" >
+							<button  *ngIf = "originalScanEnabled" [style.background-color] = "originalScanButtonBackgroundColor" id="imageClassButton_0" (click)="changeImageClass(0);" >Original Scan&nbsp;</button>
+						  <button  *ngIf = "brainExtractionEnabled" [style.background-color] = "brainExtractionButtonBackgroundColor"  id="imageClassButton_1" (click)="changeImageClass(1);" >Brain Extraction&nbsp;</button>
+
+							<div *ngIf = "originalScanEnabled">
+								<button  *ngIf = "!brainExtractionEnabled" style = "background-color:#C0C0C0;" id="imageClassButton_1" disabled >Brain_Extraction&nbsp;</button>
+							</div>
+
+						</div>
+						<div id="spacerDiv2" class = "row" *ngIf="loadingDataFlag" style="max-width: 250px;float:left;font-size:24px;font-weight:bold;" >
+							Loading ...
+						</div>
+						<i *ngIf="originalScanEnabled" class="fa fa-question-circle" aria-hidden="true" (click)="openModal('helpImageClass')"></i>
+						<div style="float:right;" *ngIf="originalScanEnabled"><a (click)="downloadPDF();"><i class="fa fa-file-pdf-o" style="font-size:18px"></i></a></div>
+						<br/>
+						<div id="spacerDiv" *ngIf="showParamsFlag">
+							{{uploadFolder.name}}
+						</div>
+
+						<div style="max-width: 100%;" *ngIf="displayRoiFlag" >
+						    <caption>Regions:</caption>
+
+								<ng-multiselect-dropdown
+								  [placeholder]="'Regions of Interest'"
+									[settings]="dropdownSettings"
+								  [data]="dropdownList"
+								  [(ngModel)]="selectedRegionsList"
+									[ngModelOptions]="{standalone: true}"
+								  (onSelect)="onRegionSelect($event)"
+									(onDeSelect)="onRegionDeSelect($event)"
+								  (onSelectAll)="onSelectAll($event)">
+								</ng-multiselect-dropdown>
+								<br/>
+						</div>
+						<!-- <div style=" max-width: 100%;" *ngIf="!displayRoiFlag" >
+							<br/>
+						</div> -->
+						<div style=" max-width: 250px;" *ngIf="displayRoiFlag" >
+								ROI Overlay Slider:&nbsp;<i *ngIf="originalScanEnabled" class="fa fa-question-circle" aria-hidden="true" (click)="openModal('helpRoiOverlaySlider')"></i>
+								<div class="slidecontainer" style="float:left;">
+							  	<input type="range" min="0" max="100" value="{{roiSliderValue}}" class="slider" id="roiSlider" (input)="setRoiSliderValue();">
+		  				 		<div>Slider Value: {{roiSliderValue}}</div>
+								</div>&nbsp;
+								<br/>
+								<br/>
+						</div>
+
+
+						<div style="max-width: 100%;" *ngIf="displaySaliencyFlag">
+							<br/>
+							<div style="max-width: 100%;" *ngIf="saliencyDataFlag">
+									<label id="saliencyMap">
+							    	<input type="checkbox" [checked] = "saliencyMapSelected" (change)="displaySaliencyMap();" [(ngModel)]="saliencyMapSelected" [ngModelOptions]="{standalone: true}" [disabled] = "disableSelection">Overlay Saliency Map&nbsp;
+								  </label>
+									<div *ngIf = "saliencyMapSelected">
+										<button *ngFor = "let saliencyData of saliencyDataList; let selectedSaliencyDataIndex = index" [attr.data-index]="selectedSaliencyDataIndex" (click) = "setSaliencyData(selectedSaliencyDataIndex)"
+														 [style.background-color] = "saliencyData.buttonColor" >{{saliencyData.description}}</button>&nbsp;
+									</div>
+									<div *ngIf="regionsSelected" style="position:relative;">
+										<label id="totalVoxels">
+								    	<input type="checkbox" [checked] = "totalVoxelsSelected" [(ngModel)]="totalVoxelsSelected" [ngModelOptions]="{standalone: true}" [disabled] = "disableLineChartsSelection">Show Total Voxels&nbsp;
+									  </label>
+										<label id="thresholdProportional">
+								    	<input type="checkbox" [checked] = "thresholdProportionalSelected" [(ngModel)]="thresholdProportionalSelected" [ngModelOptions]="{standalone: true}" [disabled] = "disableLineChartsSelection">Show Threshold Proportional&nbsp;
+									  </label>
+										<label id="zmBin">
+								    	<input type="checkbox" [checked] = "zmBinSelected" [(ngModel)]="zmBinSelected" [ngModelOptions]="{standalone: true}" [disabled] = "disableLineChartsSelection">Show ZM Bin&nbsp;
+									  </label>&nbsp;
+										<i *ngIf="originalScanEnabled" class="fa fa-question-circle" aria-hidden="true" (click)="openModal('helpRoiGraphs')"></i>
+									</div>
+							</div>
+
+							<div style=" max-width: 250px;" *ngIf="saliencyDataFlag">
+									Saliency Map Slider:&nbsp;<i *ngIf="originalScanEnabled" class="fa fa-question-circle" aria-hidden="true" (click)="openModal('helpSaliencyMapSlider')"></i>
+									<div class="slidecontainer" style="float:left;">
+										<input type="range" min="0" max="100" value="{{this.saliencyMapSliderValue}}" class="slider" id="saliencyMapSlider" (input)="setSaliencyMapSliderValue();" [disabled]="disableSaliencySlider">
+										<div>Slider Value: {{saliencyMapSliderValue}}</div>
+									</div>
+									<!-- <input [value] = "selectedSaliencyColor" [(colorPicker)]="selectedSaliencyColor" [style.background]="selectedSaliencyColor" [(ngModel)]="selectedSaliencyColor" [ngModelOptions]="{standalone: true}" (colorPickerChange) = "setSaliencyColor()" (colorPickerSelect) = "setSaliencyColor()"  /> -->
+									<div *ngIf = "saliencyMapSelected" class="slidecontainer" style="float:left;">
+										Select Saliency Color:&nbsp;
+										<input [(colorPicker)]="selectedSaliencyColor" [style.background]="selectedSaliencyColor" [(ngModel)]="selectedSaliencyColor" [ngModelOptions]="{standalone: true}" (colorPickerChange) = "setSaliencyColor()" (colorPickerSelect) = "setSaliencyColor()"  />
+									</div>
+
+			        </div>
+					  </div>
+
+						<br/>
+						<br/>
+					</div>
+					<div style="font-size:24px;font-weight:bold;"  *ngIf = "originalScanEnabled" >PD Score:<font color="red">{{predictionData.pdScore}}</font></div>
+
+					<!-- <app-ui-task></app-ui-task> -->
+
+					<div style="width: 100%; display: table;border-spacing:0px;">
+					    <div id = "imageDiv" style="display: table-row;border-spacing:0px; ">
+								<table>
+									<tr>
+										<td [style.width.px] = "mainPanelWidth">
+											<div  class="btn-group" *ngIf = "originalScanEnabled" style="margin-left:1px;" >
+												<button  id="button_0" [style.background-color] = "defaultButtonColor" (click)="changeView(0);" >Coronal</button>
+											  <button  id="button_1" [style.background-color] = "unSelectedDefaultButtonColor" (click)="changeView(1);" >Axial</button>
+											  <button  id="button_2"  [style.background-color] = "unSelectedDefaultButtonColor" (click)="changeView(2);" >Sagittal</button>&nbsp;
+												<button  id="button_center" [style.background-color] = "unSelectedDefaultButtonColor"  (click)="gotoCenter();" style="width:90%" >Center</button>&nbsp;
+												<button type="button" class="btn btn-secondary" (click)="filterComments(0)" [style.background-color] = "commentsFilterButtonColor_0" value="Usr" id="commentsFilterButton_0" formcontrolName="commentTypeSel">User</button>
+												<button type="button" class="btn btn-secondary" (click)="filterComments(1)" [style.background-color] = "commentsFilterButtonColor_1" value="Alg" id="commentsFilterButton_1" formcontrolName="commentTypeSel">Auto</button>
+												<button type="button" class="btn btn-secondary" (click)="filterComments(2)" [style.background-color] = "commentsFilterButtonColor_2" value="All" id="commentsFilterButton_2" formcontrolName="commentTypeSel">All</button>
+												&nbsp;
+												<i *ngIf="originalScanEnabled" class="fa fa-question-circle" aria-hidden="true" (click)="openModal('helpSearchType')"></i>&nbsp;
+												<i *ngIf="originalScanEnabled" aria-hidden="true" class="fa fa-plus" aria-hidden="true" (click)="showHideCrossHairs()"></i>&nbsp;
+												<i *ngIf="originalScanEnabled" aria-hidden="true" class="fa fa-undo" aria-hidden="true" (click)="resetBrightnessContrast()"></i>&nbsp;
+
+											</div>
+										</td>
+										<td width="170px;">
+											<div *ngIf = "originalScanEnabled" style="float:right;margin-right:10px;"  >
+												<input type="text" class="form-control empty" [(ngModel)]="searchText"  [ngModelOptions]="{standalone: true}" placeholder='&#xF002;'/>
+											</div>
+										</td>
+									</tr>
+									<tr>
+										<td>
+
+											<table style="border-spacing:0px;line-height:0px;vertical-align:top;">
+											 <tr style="border-spacing:20px;vertical-align:top;">
+												 <td style="border-spacing:20px;">
+													 <div id = "target_0" class="imageClass_0" style="position:relative;display: inline-block;vertical-align:top;" [style.width.px] = "sidePanelWidth" [style.height.px] = "sidePanelWidth">
+													 </div>
+												 </td>
+												 <td style="border-spacing:20px;">
+													 <div id = "target_1" class="imageClass_1" style="position:relative;display: inline-block;vertical-align:top;" [style.width.px] = "sidePanelWidth" [style.height.px] = "sidePanelHeight">
+													 </div>
+												 </td>
+												 <td style="border-spacing:20px;">
+													 <div id = "target_2"  class="imageClass_2" style="position:relative;display: inline-block;vertical-align:top;" [style.width.px] = "sidePanelWidth" [style.height.px] = "sidePanelHeight">
+													 </div>
+												 </td>
+											 </tr>
+										 </table> <!--- end table for image canvases -->
+
+										</td>
+
+									</tr>
+								</table><!-- end main table -->
+
+							</div>
+
+							<br/>
+							<div class="row" *ngIf="originalScanEnabled">
+
+								<table class="table table-striped">
+ 								  <caption style="caption-side: top;background-color: '#D1F5EF';color:red;">Cortical Thickness</caption>
+									<thead>
+								 <tr>
+									 <td *ngFor = "let corticalThicknessHeader of reportData.corticalThicknessHeaders">
+										 {{corticalThicknessHeader}}
+									 </td>
+								 </tr>
+							 </thead>
+							 <tbody>
+								 <tr>
+									 <td *ngFor = "let corticalThicknessValue of reportData.corticalThicknessList">
+										 {{corticalThicknessValue}}
+									 </td>
+								 </tr>
+							 </tbody>
+							 </table> <!--- end table for image canvases -->
+
+							</div>
+
+							<!-- mriQCColumns:string[];
+						  mriQCValues:string[];
+
+						  demographicsColumns:string[];
+						  demographicsValues:string[];
+
+						  roiColumns:string[];
+						  roiValues:string[];
+
+						  reportGraphTitles:string[];
+						  reportGraphDataList:string[];
+ -->
+							<div class="row" *ngIf="originalScanEnabled">
+
+								<table class="table table-striped">
+									<caption style="caption-side: top;background-color: '#D1F5EF';color:red;">MRI QC</caption>
+									<thead>
+								 <tr>
+									 <td *ngFor = "let mriQCColumn of reportData.mriQCColumns">
+										 {{mriQCColumn}}
+									 </td>
+								 </tr>
+							 </thead>
+							 <tbody>
+								 <tr>
+									 <td *ngFor = "let mriQCValue of reportData.mriQCValues">
+										 {{mriQCValue}}
+									 </td>
+								 </tr>
+							 </tbody>
+							 </table> <!--- end table for image canvases -->
+
+							</div>
+
+							<div class="row" *ngIf="originalScanEnabled">
+
+								<table class="table table-striped">
+									<caption style="caption-side: top;background-color: '#D1F5EF';color:red;">Demographics</caption>
+									<thead>
+								 <tr>
+									 <td *ngFor = "let demographicsColumn of reportData.demographicsColumns">
+										 {{demographicsColumn}}
+									 </td>
+								 </tr>
+							 </thead>
+							 <tbody>
+								 <tr>
+									 <td *ngFor = "let demographicsValue of reportData.demographicsValues">
+										 {{demographicsValue}}
+									 </td>
+								 </tr>
+							 </tbody>
+							 </table> <!--- end table for image canvases -->
+
+							</div>
+
+							<div class="row" *ngIf="originalScanEnabled">
+
+								<table class="table table-striped">
+									<caption style="caption-side: top;background-color: '#D1F5EF';color:red;">ROI Data</caption>
+									<thead>
+								 <tr>
+									 <td *ngFor = "let roiColumn of reportData.roiColumns">
+										 {{roiColumn}}
+									 </td>
+								 </tr>
+							 </thead>
+							 <tbody>
+								 <tr>
+									 <td *ngFor = "let roiValue of reportData.roiValues">
+										 {{roiValue}}
+									 </td>
+								 </tr>
+							 </tbody>
+							 </table> <!--- end table for image canvases -->
+
+							</div>
+
+							<div class="row" *ngIf="originalScanEnabled">
+
+								<table class="table table-striped">
+									<caption style="caption-side: top;background-color: '#D1F5EF';color:red;">Plots</caption>
+
+									<thead>
+								 <tr>
+									 <td *ngFor = "let reportGraphTitle of reportData.reportGraphTitles">
+										 {{reportGraphTitle}}
+									 </td>
+								 </tr>
+							 </thead>
+							 <tbody>
+								 <tr>
+									 <td *ngFor = "let reportGraphPath of reportData.reportGraphPathList">
+										 <!-- <img [src]="reportGraphPathList" alt="boxplot" width="70%" height="70%" /><br/> -->
+										 <img [src]="reportGraphPath" alt="reportGraph" /><br/>
+
+									 </td>
+								 </tr>
+							 </tbody>
+							 </table> <!--- end table for image canvases -->
+
+							</div>
+
+							<!-- <table class="table table-bordered table-striped table-sm">
+								<tr>
+									<th>Name</th>
+									<th>Chksum</th>
+									<th>Status</th>
+									<th>View Results</th>
+									<th>Report</th>
+									<th>Delete</th>
+								</tr>
+								<tr *ngFor="let datafile of datafiles | listFilesFilter : searchDataFilesString"  id="{{datafile.name}}" [style.background-color]="datafile.rowColor">
+
+									<td>
+											 <a [routerLink]="['/datafile-detail',datafile.id]" >
+											{{datafile.name}}
+											 </a>
+									</td>
+
+									<td>{{ datafile.chksum}}</td>
+									<td>
+										{{ datafile.status }}
+									</td>
+									<td>
+										<div *ngIf = "datafile.resultsAvailable == 'yes'">
+											<a [routerLink]="['/brain-viewer',datafile.id]" >
+												View Results
+											</a>
+											<br/>
+										</div>
+										<div *ngIf = "datafile.resultsAvailable == 'no'">
+											<div *ngIf = "datafile.status == 'Analysis Submitted'">
+												Processing ..
+											</div>
+											<div *ngIf = "datafile.status == 'Uploaded'">
+												Uploaded
+											</div>
+										</div>
+									</td>
+									<td>
+										<div *ngIf = "datafile.resultsAvailable == 'yes'">
+											<a [routerLink]="['/report',datafile.id]" >
+												Report
+											</a>
+										</div>
+										<div *ngIf = "datafile.resultsAvailable == 'no'">
+											<div *ngIf = "datafile.status == 'Analysis Submitted'">
+												Processing ..
+											</div>
+											<div *ngIf = "datafile.status == 'Uploaded'">
+												Uploaded
+											</div>
+										</div>
+									</td>
+									<td>
+										<button  id="delete_button_{{datafile.id}}" (click)="deleteDatafile($event);" class="btn btn-danger">Delete</button>&nbsp;
+									</td>
+								</tr>
+							</table> -->
+
+
+							<div  class="row" style="float:clear;" *ngIf= "originalScanEnabled">
+
+								<div *ngIf = "displayRoiFlag">
+									<div *ngIf = "totalVoxelsSelected">
+										<div style="width:300px;height:300px;float:left;" *ngIf = "totalVoxelsPlotData">
+											<figure><figcaption >Total Voxels at saliency {{saliencyMapSliderValue}}</figcaption>
+												<canvas *ngIf="totalVoxelsPlotData?.length > 0"
+													baseChart
+													[datasets]="totalVoxelsPlotData"
+													[labels]="totalVoxelsLabel"
+													[options]="barPlotOptions"
+													[legend]="barPlotLegend"
+													[colors]= "totalVoxelsColorsList"
+													[chartType]="barPlotType">
+												</canvas>
+											</figure>
+										</div>
+									</div>
+								</div>
+
+								<div *ngIf = "displayRoiFlag">
+									<div *ngIf = "thresholdProportionalSelected">
+										<div style="width:300px;height:300px;float:left;" *ngIf = "thresholdProportionalPlotData">
+											<figure><figcaption  >Threshold Proportional at saliency {{saliencyMapSliderValue}}</figcaption>
+												<canvas *ngIf="thresholdProportionalPlotData?.length > 0"
+													baseChart
+													[datasets]="thresholdProportionalPlotData"
+													[labels]="thresholdProportionalLabel"
+													[options]="barPlotOptions"
+													[legend]="barPlotLegend"
+													[colors]= "thresholdProportionalColorsList"
+													[chartType]="barPlotType">
+												</canvas>
+											</figure>
+									 </div>
+								 </div>
+						 	 </div>
+
+							 <div *ngIf = "displayRoiFlag">
+								 <div *ngIf = "zmBinSelected">
+									 <div style="width:300px;height:300px;;float:left;" *ngIf = "zmBinPlotData">
+										 <figure><figcaption >ZM Bin at saliency {{saliencyMapSliderValue}}</figcaption>
+												<canvas *ngIf="zmBinPlotData?.length > 0"
+													baseChart
+													[datasets]="zmBinPlotData"
+													[labels]="zmBinLabel"
+													[options]="barPlotOptions"
+													[legend]="barPlotLegend"
+													[colors]= "zmBinColorsList"
+													[chartType]="barPlotType">
+												</canvas>
+											</figure>
+										</div>
+								  </div>
+							 </div>
+
+						  </div>
+							<!-- <div  *ngIf = "originalScanEnabled"  class="btn-group">
+								<button  id="button_0" style = "background-color:#834793;" (click)="showHideStats();" *ngIf="showStatsFlag">Hide Stats&nbsp;<i class="fa fa-angle-double-up" aria-hidden="true"></i>
+								</button>&nbsp;
+								<button  id="button_0" style = "background-color:#834793;" (click)="showHideStats();" *ngIf="!showStatsFlag">Show Stats&nbsp;<i class="fa fa-angle-double-down" aria-hidden="true"></i>
+								</button>&nbsp;
+							</div> -->
+							<div id="spacerDiv" *ngIf="showStatsFlag">
+								<!-- <br/> -->
+							</div>
+
+							<div id="statsDiv" *ngIf= "showStatsFlag" style="border: 2px dashed;padding:5px;height:800px;">
+
+								<!-- <div *ngFor="let imageGraphObj for imageGraphObjs" style="float:left;" *ngIf= "originalScanEnabled">
+									<img [src]="boxPlotImagePath" alt="boxplot" width="70%" height="70%" /><br/>
+								</div> -->
+
+							</div>
+
+					</div>
+
+				</fieldset>
+			</form>
+
+	</div>
+</div>

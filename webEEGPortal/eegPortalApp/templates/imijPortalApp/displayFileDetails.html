@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block css %}
+<!--<link rel="stylesheet" type="text/css" href="/static/css/default.css">-->
+<!-- <link rel="stylesheet" type="text/css" href="/static/css/nouislider.css"> -->
+<!-- div.demo { padding: 10px !important; }; -->
+{% endblock css%}
+{% block js %}
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#fileListTable').DataTable();
+
+  } );
+
+  function submitDataFileForm(obj){
+      objId = obj.id;
+      data = objId.split("-");
+      if (data.length > 0){
+         dataFileId = data[1];
+      }
+    $("#dataFileId").val(dataFileId);
+    $("#dataFileForm").submit();
+  }
+
+</script>
+
+{% endblock js %}
+
+{% block content %}
+
+<!-- /.row -->
+<div class="row">
+  <div class="col-lg-12">
+    <h1 class="page-header">Data file {{fileName}}</h1>
+  </div>
+  <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<form method = "post" id = "dataFileForm" name = "dataFileForm" action="/imijPortalApp/displayFileDetails/">
+ {% csrf_token %}
+ <input type="hidden" value="{{uploadFile.id}}" name="uploadFileId" id ="uploadFileId"/>
+ <input type="hidden" value="{{project.id}}" name="projectId" id ="projectId"/>
+  <div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        File Data
+      </div>
+      <!-- /.panel-heading -->
+      <div class="panel-body" >
+      {% for image in images%}
+      <div class="panel-group" id="accordion1">
+        <div class="panel panel-warning">
+	         <div class="panel-heading">
+	            <h4 class="panel-title">
+	  	            <a data-toggle="collapse" data-parent="#accordion3" href="#filePanel-{{forloop.counter0}}">
+	  	                {{ image }} </b>&nbsp;(  Please click to toggle this panel. )
+	  	            </a>
+	            </h4>
+	         </div>
+           <div class="panel-body">
+             <img src = "/static/img/{{image}}" width="300px;" height="300px;"/>
+           </div>
+        </div>
+      </div>
+      {% endfor %}
+      </div>
+      <!-- /.panel-body -->
+    </div>
+    <!-- /end panel -->
+  </div>
+  <!-- /.col-lg-12 -->
+ </div>
+ <!-- /.row -->
+  <p class="text-center">
+
+   <button type="submit" class="btn btn-primary btn-lg" value = "0" name = "submitButton" id="submitButton-0" onclick ="javascript:submitDataFileHandlerForm(this);">Back to Project List</button>&nbsp;&nbsp;&nbsp;
+   <button type="submit" class="btn btn-danger btn-lg" value = "1" name="submitButton" id="submitButton-1" onclick ="javascript:submitDataFileHandlerForm(this);">Add Data File</button>
+
+ </p>
+</form>
+{% endblock content %}

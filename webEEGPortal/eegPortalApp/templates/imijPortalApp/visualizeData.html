@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+{% block css %}
+<style>
+text{
+	font-size:12px;
+}
+.mainBars rect{
+  shape-rendering: auto;
+  fill-opacity: 0;
+  stroke-width: 0.5px;
+  stroke: rgb(0, 0, 0);
+  stroke-opacity: 0;
+}
+.subBars{
+	shape-rendering:crispEdges;
+}
+.edges{
+	stroke:none;
+	fill-opacity:0.5;
+}
+.header{
+	text-anchor:middle;
+	font-size:16px;
+}
+line{
+	stroke:grey;
+}
+</style>
+
+{% endblock css%}
+{% block js %}
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="http://vizjs.org/viz.v1.1.0.min.js"></script>
+
+<script type="text/javascript">
+
+  $(document).ready(function() {
+
+    $('#dataFileTable').DataTable();
+
+  var data=[
+  {% for row in dfMatrix %}
+     ['{{row.0}}','{{row.1}}','{{row.2}}','{{row.3}}' ],
+  {% endfor %}
+  ]
+  ;
+  //debugger;
+  //alert("1");
+  var color ={
+  {% for row in dfMatrix %}
+  "{{row.0}}":"{{row.6}}",
+  {% endfor %}
+  };
+  var svg = d3.select("#d3Display").append("svg").attr("width", 960).attr("height", 800);
+
+  svg.append("text").attr("x",250).attr("y",70)
+  	.attr("class","header").text("{{fileName1}}");
+
+  svg.append("text").attr("x",750).attr("y",70)
+  	.attr("class","header").text("{{fileName2}}");
+
+  var g =[svg.append("g").attr("transform","translate(150,100)")
+  		,svg.append("g").attr("transform","translate(650,100)")];
+
+  var bp=[ viz.bP()
+  		.data(data)
+  		.min(12)
+  		.pad(1)
+  		.height(600)
+  		.width(200)
+  		.barSize(35)
+  		.fill(d=>color[d.primary])
+  	,viz.bP()
+  		.data(data)
+  		.value(d=>d[3])
+  		.min(12)
+  		.pad(1)
+  		.height(600)
+  		.width(200)
+  		.barSize(35)
+  		.fill(d=>color[d.primary])
+  ];
+
+  [0,1].forEach(function(i){
+  	g[i].call(bp[i])
+
+  	g[i].append("text").attr("x",-50).attr("y",-8).style("text-anchor","middle").text("Gene");
+  	g[i].append("text").attr("x", 250).attr("y",-8).style("text-anchor","middle").text("Pathway");
+
+  	g[i].append("line").attr("x1",-100).attr("x2",0);
+  	g[i].append("line").attr("x1",200).attr("x2",300);
+
+  	g[i].append("line").attr("y1",610).attr("y2",610).attr("x1",-100).attr("x2",0);
+  	g[i].append("line").attr("y1",610).attr("y2",610).attr("x1",200).attr("x2",300);
+    //debugger;
+  	g[i].selectAll(".mainBars")
+  		.on("mouseover",mouseover)
+  		.on("mouseout",mouseout);
+
+  	g[i].selectAll(".mainBars").append("text").attr("class","label")
+  		.attr("x",d=>(d.part=="primary"? -30: 30))
+  		.attr("y",d=>+6)
+  		.text(d=>d.key)
+  		.attr("text-anchor",d=>(d.part=="primary"? "end": "start"));
+
+  	g[i].selectAll(".mainBars").append("text").attr("class","perc")
+  		.attr("x",d=>(d.part=="primary"? -100: 80))
+  		.attr("y",d=>+6)
+  		.text(function(d){ return d3.format("0.0%")(d.percent)})
+  		.attr("text-anchor",d=>(d.part=="primary"? "end": "start"));
+      //debugger;
+  });
+
+  function mouseover(d){
+  	[0,1].forEach(function(i){
+  		bp[i].mouseover(d);
+
+  		g[i].selectAll(".mainBars").select(".perc")
+  		.text(function(d){ return d3.format("0.0%")(d.percent)});
+  	});
+  }
+  function mouseout(d){
+  	[0,1].forEach(function(i){
+  		bp[i].mouseout(d);
+
+  		g[i].selectAll(".mainBars").select(".perc")
+  		.text(function(d){ return d3.format("0.0%")(d.percent)});
+  	});
+  }
+  d3.select(self.frameElement).style("height", "800px");
+
+    } );
+
+</script>
+
+{% endblock js %}
+
+{% block content %}
+
+<!-- /.row -->
+<div class="row">
+  <div class="col-lg-12">
+    <h1 class="page-header">Expression data</h1>
+  </div>
+  <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<form method = "post" id = "dataFileForm" name = "dataFileForm" action="/chronux/displayFileDetails/">
+ {% csrf_token %}
+ <input type="hidden" value="" name="dataFileId" id ="dataFileId"/>
+ <input type="hidden" value="{{project.id}}" name="projectId" id ="projectId"/>
+  <div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Expression Data
+      </div>
+      <!-- /.panel-heading -->
+      <div class="panel-body" >
+        <div id="d3Display"></div>
+        <div class="table-responsive" >
+	  <table id="dataFileTable" class="display" cellspacing="0" width="100%">
+	   <thead>
+	      <tr >
+		<th>Gene</th>
+		<th>Pathway</th>
+		<th>Count V1</th>
+		<th>Count V2</th>
+              </tr>
+           </thead>
+           <tbody>
+           {% for row in dfMatrix %}
+             <tr>
+               <td> <a href='https://www.ncbi.nlm.nih.gov/gene/{{ row.0 }}'>{{row.5}}</a>  </td>
+               <td>
+	       {% if database == 'BioCarta_pathways'%}<a href="http://software.broadinstitute.org/gsea/msigdb/cards/BIOCARTA_{{ row.1 }}">{{ row.1 }}</a>{% else %}{{row.1}}{% endif %}
+	       </td>
+               <td> {{ row.2 }}  </td>
+               <td>{{ row.3 }}</td>
+             </tr>
+           {% endfor %}
+           </tbody>
+          </table>
+        </div>
+        <!-- /.table-responsive -->
+      </div>
+      <!-- /.panel-body -->
+    </div>
+
+  </div>
+  <!-- /.col-lg-12 -->
+ </div>
+
+ <!-- /.row -->
+  <p class="text-center">
+
+   <button type="submit" class="btn btn-primary btn-lg" value = "0" name = "submitButton" id="submitButton-0" onclick ="javascript:submitDataFileHandlerForm(this);">Back to Project List</button>&nbsp;&nbsp;&nbsp;
+   <button type="submit" class="btn btn-danger btn-lg" value = "1" name="submitButton" id="submitButton-1" onclick ="javascript:submitDataFileHandlerForm(this);">Add Data File</button>
+
+ </p>
+</form>
+{% endblock content %}

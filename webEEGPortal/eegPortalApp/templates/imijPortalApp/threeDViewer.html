@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load staticfiles %}
+
+{% block css %}
+
+{% endblock css%}
+{% block js %}
+<!-- The File Upload audio preview plugin -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/98/three.min.js"></script>
+<!-- The File Upload video preview plugin -->
+<script src="{% static "js/threeDviewer.js" %}"></script>
+<script type="text/javascript">
+  $(document).ready(function() {});
+</script>
+{% endblock js %}
+{% block content %}
+<form action="/imijPortalApp/processLanding/" enctype="multipart/form-data" method="post" id="landingForm">
+  {% csrf_token %}
+  <div class="container-fluid" style="min-height:10%; ">
+    <div class="row">
+      <div class="col-sm-8"><br>
+        <center>
+          <h1>R.O.I. Model</h1>
+        </center>
+      </div>
+    </div>
+  </div><br>
+  <nav class="navbar navbar-default" role="navigation">
+    <div class="navbar-header" style="width: 100%;"><br><br>
+      <center>
+        <div id="threejsbrain"></div>
+      </center>
+    </div>
+  </nav>
+</form>
+{% endblock content %}

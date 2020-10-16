@@ -1,0 +1,61 @@
+{% load staticfiles %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!-- pako js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.7/pako.min.js"></script>
+<!-- math js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/5.4.0/math.min.js"></script>
+<!-- js -->
+<script src="{% static "js/nifti-reader-min.js" %}"></script>
+
+{% block css %}
+<style>
+.rTable    { display: table; }
+.rTableRow       { display: table-row; }
+.rTableHeading    { display: table-header-group; font-weight:bold; text-align: center;}
+.rTableBody    { display: table-row-group; }
+.rTableFoot    { display: table-footer-group; }
+.rTableCell, .rTableHead  { display: table-cell; padding: 10px;}
+{% for imageType in imageTypes %}
+#{{imageType}}{position:relative;}
+#horizontal-{{imageType}}{width:1px;height:100%;position:absolute;background-color:red;}
+#vertical-{{imageType}}{width:100%;height:1px;position:absolute;background-color:red;}
+{% endfor %}
+</style>
+{% endblock css%}
+{% block js %}
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    alert("1");
+
+    // var data = // an ArrayBuffer
+    var niftiHeader = null,
+        niftiImage = null,
+        niftiExt = null;
+    var data = new ArrayBuffer("{{brainData}}");
+    if (nifti.isCompressed(data)) {
+        data = nifti.decompress(data);
+    }
+
+    if (nifti.isNIFTI(data)) {
+        niftiHeader = nifti.readHeader(data);
+        console.log(niftiHeader.toFormattedString());
+        niftiImage = nifti.readImage(niftiHeader, data);
+
+        if (nifti.hasExtension(niftiHeader)) {
+            niftiExt = nifti.readExtensionData(niftiHeader, data);
+        }
+    }
+
+    alert("2");
+    });
+
+</script>
+{% endblock js %}
+{% block content %}
+
+<form action="/imijPortalApp/processLanding/" enctype="multipart/form-data" method="post" id="landingForm">
+  {% csrf_token %}
+</form>
+{% endblock content %}

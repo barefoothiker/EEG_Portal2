@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block css %}
+<!--<link rel="stylesheet" type="text/css" href="/static/css/default.css">-->
+<!-- <link rel="stylesheet" type="text/css" href="/static/css/nouislider.css"> -->
+<!-- div.demo { padding: 10px !important; }; -->
+{% endblock css%}
+{% block js %}
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#fileListTable').DataTable();
+
+  } );
+
+  function submitFetchDetails(obj){
+      objId = obj.id;
+      data = objId.split("-");
+      if (data.length > 0){
+         uploadFileId = data[1];
+      }
+    $("#dataFileForm").attr('action',"/imijPortalApp/fetchDetails/");
+    $("#uploadFileId").val(uploadFileId);
+
+    $("#dataFileForm").submit();
+  }
+
+  function submitDelete(obj){
+    if (confirm("Are you sure? You will lose all analysis data once you delete the file.") == true ){
+
+        objId = obj.id;
+        data = objId.split("-");
+        if (data.length > 0){
+           uploadFileId = data[1];
+        }
+      $("#dataFileForm").attr('action',"/imijPortalApp/submitDeleteUploadedFile/");
+      $("#uploadFileId").val(uploadFileId);
+
+      $("#dataFileForm").submit();
+    }
+  }
+
+  function submitProcess(obj){
+      objId = obj.id;
+      data = objId.split("-");
+      if (data.length > 0){
+         uploadFileId = data[1];
+      }
+    $("#dataFileForm").attr('action',"/imijPortalApp/processData/");
+    $("#uploadFileId").val(uploadFileId);
+
+    $("#dataFileForm").submit();
+  }
+
+  function submitCheckProgress(obj){
+      objId = obj.id;
+      data = objId.split("-");
+      if (data.length > 0){
+         uploadFileId = data[1];
+      }
+    $("#dataFileForm").attr('action',"/imijPortalApp/checkProgress/");
+    $("#uploadFileId").val(uploadFileId);
+
+    $("#dataFileForm").submit();
+  }
+
+</script>
+
+{% endblock js %}
+
+{% block content %}
+
+<!-- /.row -->
+<div class="row">
+  <div class="col-lg-12">
+    <h1 class="page-header">List of uploaded files</h1>
+  </div>
+  <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<form method = "post" id = "dataFileForm" name = "dataFileForm" action="/imijPortalApp/listUploadedFiles/">
+ {% csrf_token %}
+ <input type="hidden" value="{{uploadFile.id}}" name="uploadFileId" id ="uploadFileId"/>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          List files
+        </div>
+        <!-- /.panel-heading -->
+        <div class="panel-body" >
+          <div class="table-responsive" >
+        	  <table id="fileListTable" class="display" cellspacing="0" width="100%">
+        	   <thead>
+        	      <tr>
+              		<th>Name</th>
+                  <th>Details</th>
+                  <th>Process</th>
+              		<th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+              {% for fileObj in fileList %}
+               <tr>
+                   <td>{{fileObj.name}}</td>
+                   <td> <button type="submit" class="btn btn-primary" value = "{{fileObj.id}}" name = "fileDetailButton" id = "fileDetailButton-{{fileObj.id}}" onclick="javascript:submitCheckProgress(this);">Details</button></td>
+                   <td> <button type="submit" class="btn btn-primary" value = "{{fileObj.id}}" name = "fileDetailButton" id = "fileDetailButton-{{fileObj.id}}" onclick="javascript:submitProcess(this);">Process</button></td>
+                   <td> <button type="submit" class="btn btn-danger" value = "{{fileObj.id}}" name = "fileDetailButton" id = "fileDetailButton-{{fileObj.id}}" onclick="javascript:submitDelete(this);">Delete</button></td>
+               </tr>
+               {% endfor %}
+
+           </tbody>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock content %}

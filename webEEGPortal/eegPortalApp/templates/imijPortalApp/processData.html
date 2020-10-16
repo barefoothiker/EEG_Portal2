@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block css %}
+<!--<link rel="stylesheet" type="text/css" href="/static/css/default.css">-->
+<!-- <link rel="stylesheet" type="text/css" href="/static/css/nouislider.css"> -->
+<!-- div.demo { padding: 10px !important; }; -->
+{% endblock css%}
+{% block js %}
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('#fileListTable').DataTable();
+
+  } );
+
+  function fetchFileDetails(obj){
+      objId = obj.id;
+      data = objId.split("-");
+      if (data.length > 0){
+         dataFileId = data[1];
+      }
+    $("#dataFileId").val(dataFileId);
+    $("#dataFileForm").submit();
+  }
+
+    function submitUpload(obj){
+        objId = obj.id;
+        data = objId.split("-");
+        if (data.length > 0){
+           dataFileId = data[1];
+        }
+      $("#dataFileForm").attr('action',"imijPortalApp/uploadfiles");
+
+      $("#dataFileForm").submit();
+    }
+
+</script>
+
+{% endblock js %}
+
+{% block content %}
+
+<!-- /.row -->
+<div class="row">
+  <div class="col-lg-12">
+    <h1 class="page-header">Select process to run</h1>
+  </div>
+  <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+<form method = "post" id = "dataFileForm" name = "dataFileForm" action="/imijPortalApp/submitProcessData/">
+ {% csrf_token %}
+ <input type="hidden" value="{{uploadFile.id}}" name="uploadFileId" id ="uploadFileId"/>
+  <div class="row">
+  <div class="col-lg-12">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        Select process
+      </div>
+      <!-- /.panel-heading -->
+      <div class="panel-body" >
+        <p>
+          <label>File:&nbsp;</label>{{uploadFile.name}}
+        </p>
+        <p>
+          <label>Select Process:&nbsp;</label>
+          <select id="processList" name="processList">
+            <option value="">--Select from list --</option>
+            {% for k,v in processes.items %}
+           <option value="{{k}}">{{v}}</option>
+            {% endfor %}
+          </select>
+        </p>
+        <p style="text-align:left;">
+       <button type="submit" class="btn btn-primary btn-lg" value = "0" name = "detailButton" id="detailButton-{{fileObj.fileId}}" onclick ="javascript:fetchFileDetails(this);">Submit</button>&nbsp;&nbsp;&nbsp;
+     </p>
+     </td>
+  </tr>
+
+</tbody>
+</table>
+</div>
+
+</form>
+{% endblock content %}

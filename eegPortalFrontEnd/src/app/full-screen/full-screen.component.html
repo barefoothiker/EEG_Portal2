@@ -1,0 +1,120 @@
+<div class="modal-dialog modal-lg full-screen-modal">
+  <!-- <div class="container" id="allContainer"> -->
+  <!-- <div class="modal-body" > -->
+
+				<!-- <div style="width: 100%; display: table;border-spacing:0px;  background: #000;">
+				    <div id = "imageDiv" style="display: table-row;border-spacing:0px; "> -->
+
+        <div style="width: 100% !important; height: 100% !important;border-spacing:0px;  background: #000;" >
+          <div class="modal-header" style="width: 100% !important;pointer-events:auto;">
+            <h4 class="modal-title" style="color:#F00">Full Screen (press Esc to exit)</h4> &nbsp;
+            <div  class="row" style="float:clear;margin-left:2px;" *ngIf= "!fullScreenFlag">
+              <div  *ngIf = "originalScanEnabled" >
+                <div class="alert alert-success" role="alert" style= "height:30px;padding:5px;" >
+                  Loading full screen data ..
+                </div>
+              </div>
+            </div>
+            <!-- <div   class="btn-group" style="text-align:center;margin-left:15px;"> -->
+      				<button  id="button_0" style = "background-color:#834793;" (click)="showHideParams();" *ngIf="showParamsFlag">Hide Params&nbsp;<i class="fa fa-angle-double-up" aria-hidden="true"></i>
+      					</button>&nbsp;
+      				<button  id="button_0" style = "background-color:#834793;" (click)="showHideParams();" *ngIf="!showParamsFlag">Show Params&nbsp;<i class="fa fa-angle-double-down" aria-hidden="true"></i>
+      				</button>&nbsp;
+      			<!-- </div> -->
+            <!-- <button type="button" class="close" style="color:#F00" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+              <span aria-hidden="true" style="color:#F00" >&times;</span>
+            </button> -->
+          </div>
+
+          <div class = "row" style="max-width: 250px;margin-left:25px;font-size:24px;font-weight:bold;color:#F00;" *ngIf="!originalScanEnabled" >
+            Loading ..
+          </div>
+
+          <div style="width: 100% !important;pointer-events:auto;">
+
+				    <div id = "imageDiv" style="border-spacing:0px;display: table; ">
+
+                       <!-- <div id = "target_0_0" class="imageClass_0_0" style="position:relative;border-color:red;" >
+                       </div>
+
+                       <div class="full-screen-clearfix-left">
+                       </div>
+
+                       <div id = "target_1_1" class="imageClass_1_1" style="position:relative;margin-left:864px;border-color:red;">
+                       </div>
+
+                       <div class="full-screen-clearfix-left">
+                       </div>
+
+                       <div id = "target_2_2"  class="imageClass_2_2" style="position:relative;margin-left:864px;margin-top:432px;border-color:red;">
+                       </div>
+
+                       <div class="full-screen-clearfix-left">
+                       </div> -->
+
+                       <table>
+       									  <tr>
+                            <td>
+                             <table style="border-spacing:0px;line-height:0px;vertical-align:top;">
+       											 <tr style="border-spacing:0px;vertical-align:top;">
+       												 <td rowspan="2" style="border-spacing:0px;">
+       													 <div id = "target_0_0" class="imageClass_0_0" style="position:relative;display: inline-block;vertical-align:top;" [style.width.px] = "mainPanelWidth" [style.height.px] = "mainPanelHeight">
+       													 </div>
+       												 </td>
+       												 <td style="border-spacing:0px;">
+       													 <div id = "target_1_1" class="imageClass_1_1" style="position:relative;display: inline-block;vertical-align:top;" [style.width.px] = "sidePanelWidth" [style.height.px] = "sidePanelHeight">
+       													 </div>
+       												 </td>
+       											 </tr>
+       											 <tr style="border-spacing:0px;vertical-align:top;">
+       												 <td style="border-spacing:0px;">
+       													 <div id = "target_2_2"  class="imageClass_2_2" style="position:relative;display: inline-block;vertical-align:top;" [style.width.px] = "sidePanelWidth" [style.height.px] = "sidePanelHeight">
+       													 </div>
+       												 </td>
+       											 </tr>
+       										 </table> <!--- end table for image canvases -->
+
+       										</td>
+       										<td>
+       											<div *ngIf="originalScanEnabled" style="overflow-y: scroll;background-color:#c3e6cb;width:400px;margin-left:25px;" [style.height.px] = "mainPanelHeight">
+
+       												<ul class="list-group" width="200px;" style="margin-left:25px;margin-right:25px;">
+       												  <li class="list-group-item list-group-item-dark" style="text-align:center;cursor: default;" *ngIf="showHideCommentsFlag"><b><a (click)="showHideComments();">Comments&nbsp;<i class="fa fa-angle-double-up" aria-hidden="true"></i></a></b></li>
+       													<li class="list-group-item list-group-item-dark" style="text-align:center;cursor: default;" *ngIf="!showHideCommentsFlag"><b><a (click)="showHideComments();">Comments&nbsp;<i class="fa fa-angle-double-down" aria-hidden="true"></i></a></b></li>
+       													<ng-container *ngIf="showHideCommentsFlag">
+       														<!-- <li *ngFor="let comment of comments | filter : searchText" class="{{comment.styleClass}}" > -->
+       														<li *ngFor="let comment of comments">
+       															<div style="font-size:12px;"><i>Date:&nbsp;{{comment.commentDate}}</i></div>
+       		 												 <br/>
+       		 													<div style="font-size:14px;">X:&nbsp;{{comment.xPosition}}&nbsp;Y:&nbsp;{{comment.yPosition}}&nbsp;Z:&nbsp;{{comment.zPosition}}</div>
+       															<br/>
+       		 													 {{comment.commentText}}&nbsp;<div style="float:right;font-size:13px;text-align:center;"><a href="" (click)="showCommentDetails(comment, $event)"><i>Details</i></a></div>
+       															<br/>
+       															<div  class="btn-group btn-sm" *ngIf = "originalScanEnabled">
+       															 	<button id="button_2" (click)="gotoComment(comment);" style = "background-color:#93477C;" >Goto</button>&nbsp;
+       			 												 	<button id="button_2" *ngIf = "comment.showHideFlag == '1'" (click)="showHideComment(comment);" style = "background-color:#93477C;">Show</button>
+       			 												 	<button id="button_2" *ngIf = "comment.showHideFlag== '0'" (click)="showHideComment(comment);" style = "background-color:#834793;">Hide</button>
+       														 	</div>
+       														 </li>
+       												 	</ng-container>
+       												</ul>
+       										 </div>
+       										</td>
+       									</tr>
+       								</table><!-- end main table -->
+
+    							<br/>
+
+    				  </div>
+
+						</div>
+
+      </div>
+
+  <!-- </div>
+  <div class="modal-footer"> -->
+    <!-- <button *ngIf="allowAddComment" type="button" class="btn btn-outline-dark" (click)="submitForm()" [disabled]="disableSubmit">Submit</button>&nbsp;&nbsp;
+    <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button> -->
+  <!-- </div> -->
+<!-- </div> -->
+</div>
